@@ -13,7 +13,6 @@
 
 <form action="{% url 'footballseason:vote' week_id %}" method="post">
 	{% csrf_token %}
-	Your name: <input type="text" name="user"> <br /><br />
 	{% for game in games_list %}
 		<input type="radio" name="game{{ forloop.counter }}" id="away_team{{ forloop.counter }}" value="{{ game.away_team.id }}" />
 		<label for="away_team{{ forloop.counter }}">{{ game.away_team.team_name }} </label><br />
