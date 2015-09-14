@@ -10,6 +10,12 @@
         text-decoration: none;
 }
 
+.user-header {
+    float: right;
+    width: 100px;
+    padding: 10px;
+}
+
 .content {
         margin-left: 40px;
 }

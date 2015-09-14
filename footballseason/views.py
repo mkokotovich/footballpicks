@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 from .models import Game, Team, Pick
 
@@ -14,6 +15,7 @@ def display(request, week_id):
 	context = { 'games_list': games_list , 'week_id': week_id}
 	return render(request, 'footballseason/display.html', context)
 
+@login_required(login_url='/login/')
 def submit(request, week_id):
 	games_list = Game.objects.order_by('game_time').filter(week=week_id)
 	context = { 'games_list': games_list, 'week_id': week_id}
@@ -21,9 +23,13 @@ def submit(request, week_id):
 
 def vote(request, week_id):
 	games_list = Game.objects.order_by('game_time').filter(week=week_id)
-	name=request.POST["user"]
+	name=request.user.first_name
 	for index, game in enumerate(games_list):
-		selected_team_id=int(request.POST["game%d" % (index+1)])
+		try:
+			selected_team_id=int(request.POST["game%d" % (index+1)])
+		except:
+			selected_team_id=0
+
 		if (selected_team_id == game.away_team.id):
 			# Away team won, create pick and add game to it
 			pick = Pick(user_name=name, game=game, team_to_win=game.away_team, date_submitted=timezone.now())
@@ -32,7 +38,7 @@ def vote(request, week_id):
 			# Home team won, create pick and add game to it
 			pick = Pick(user_name=name, game=game, team_to_win=game.home_team, date_submitted=timezone.now())
 			pick.save()
-		else:
+		elif (selected_team_id != 0):
 			# Error!
 			print("Error: Invalid selected_team_id: %d" % selected_team_id)
 

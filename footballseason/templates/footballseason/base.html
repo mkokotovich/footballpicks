@@ -11,6 +11,13 @@
     <div class="page-header">
         <h1><a href="/">Football Picks</a></h1>
     </div>
+    <div class="user-header">
+        {% if user.is_authenticated %}
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+        {% endif %}
+    </div>
 
     <div class="content container">
         <div class="row">
