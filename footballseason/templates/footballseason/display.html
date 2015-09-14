@@ -1,0 +1,47 @@
+{% extends "footballseason/base.html" %}
+
+{% load get_range %}
+
+{% block content %}
+
+<div>
+<h1>Games for week {{ week_id }}</h1>
+</div>
+
+<div class="gamelist">
+{% if games_list %}
+	{% for game in games_list %}
+		<br>
+		{{ game.away_team }} &emsp; &emsp;
+		{% for pick in game.pick_set.all %}
+		{% if pick.team_to_win == game.away_team %}
+			({{ pick.user_name }}) 
+		{% endif %}
+		{% endfor %}
+		<br>
+		at
+		<br>
+		{{ game.home_team }} &emsp; &emsp;
+		{% for pick in game.pick_set.all %}
+		{% if pick.team_to_win == game.home_team %}
+			({{ pick.user_name }}) 
+		{% endif %}
+		{% endfor %}
+		<br>
+	{% endfor %}
+{% else %}
+	<p>No games added.</p>
+{% endif %}
+</div>
+
+<div>
+<h3>View picks for week:</h3>
+{% for i in 17|get_range %}
+    {% with week=i|add:"1" %}
+    <a href="{% url 'footballseason:display' week %}">{{ week }} </a> &emsp;
+    {% endwith %}
+{% endfor %}
+<br><br>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,27 @@
+{% extends "footballseason/base.html" %}
+
+{% block content %}
+
+<div>
+<h1> Welcome to Football Picks </h1>
+<br><br>
+</div>
+
+{% load get_range %}
+<h2>Submit picks for week:</h2>
+{% for i in 17|get_range %}
+    {% with week=i|add:"1" %}
+    <a href="{% url 'footballseason:submit' week %}">{{ week }} </a> &emsp; 
+    {% endwith %}
+{% endfor %}
+
+<br><br>
+
+<h2>View picks for week:</h2>
+{% for i in 17|get_range %}
+    {% with week=i|add:"1" %}
+    <a href="{% url 'footballseason:display' week %}">{{ week }} </a> &emsp; 
+    {% endwith %}
+{% endfor %}
+
+{% endblock content %}
