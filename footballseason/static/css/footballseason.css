@@ -34,3 +34,29 @@ h1, h2, h3, h4 {
 .gamelist {
     margin-bottom: 70px;
 }
+
+#games {
+    border-collapse: collapse;
+}
+
+#games td {
+    padding: 3px 7px 2px 7px;
+    background-color: #9FE09F;
+}
+
+#games tr.at td {
+    padding: 0px 7px 0px 7px;
+    font-size: 0.875em;
+    background-color: #FFFFFF;
+}
+
+#games tr.home td {
+    background-color: #9FC0E0;
+}
+
+#games tr.blank td {
+    padding: 5px 7px 5px 7px;
+    background-color: #FFFFFF;
+}
+
+

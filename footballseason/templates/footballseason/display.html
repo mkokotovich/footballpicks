@@ -10,25 +10,41 @@
 
 <div class="gamelist">
 {% if games_list %}
+	<table id="games">
 	{% for game in games_list %}
-		<br>
-		{{ game.away_team }} &emsp; &emsp;
+		<tr>
+		<td>
+			<b>{{ game.away_team }}</b>
+		</td>
+		<td>
 		{% for pick in game.pick_set.all %}
 		{% if pick.team_to_win == game.away_team %}
 			({{ pick.user_name }}) 
 		{% endif %}
 		{% endfor %}
-		<br>
+		</td>
+		</td>
+		</tr>
+		<tr class="at">
+		<td>
 		at
-		<br>
-		{{ game.home_team }} &emsp; &emsp;
+		</td>
+		</tr>
+		<tr class="home">
+		<td>
+			<b>{{ game.home_team }}</b>
+		</td>
+		<td>
 		{% for pick in game.pick_set.all %}
 		{% if pick.team_to_win == game.home_team %}
 			({{ pick.user_name }}) 
 		{% endif %}
 		{% endfor %}
-		<br>
+		</td>
+		</tr>
+		<tr class="blank"><td colspan=2>&nbsp;</td></tr>
 	{% endfor %}
+	</table>
 {% else %}
 	<p>No games added.</p>
 {% endif %}
