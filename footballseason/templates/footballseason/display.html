@@ -19,7 +19,7 @@
 		<td>
 		{% for pick in game.pick_set.all %}
 		{% if pick.team_to_win == game.away_team %}
-			({{ pick.user_name }}) 
+			{{ pick.user_name }} &nbsp;
 		{% endif %}
 		{% endfor %}
 		</td>
@@ -37,7 +37,7 @@
 		<td>
 		{% for pick in game.pick_set.all %}
 		{% if pick.team_to_win == game.home_team %}
-			({{ pick.user_name }}) 
+			{{ pick.user_name }} &nbsp;
 		{% endif %}
 		{% endfor %}
 		</td>
