@@ -14,7 +14,7 @@
 	{% for game in games_list %}
 		<tr>
 		<td>
-			<b>{{ game.away_team }}</b>
+			<b>{{ game.away_team }}</b> ({{game.away_team.wins}}-{{game.away_team.loses}}-{{game.away_team.ties}})
 		</td>
 		<td>
 		{% for pick in game.pick_set.all %}
@@ -32,7 +32,7 @@
 		</tr>
 		<tr class="home">
 		<td>
-			<b>{{ game.home_team }}</b>
+			<b>{{ game.home_team }}</b> ({{game.home_team.wins}}-{{game.home_team.loses}}-{{game.home_team.ties}})
 		</td>
 		<td>
 		{% for pick in game.pick_set.all %}
