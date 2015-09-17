@@ -50,6 +50,11 @@ h1, h2, h3, h4 {
     background-color: #FFFFFF;
 }
 
+.currentweek {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
 #games tr.home td {
     background-color: #9FC0E0;
 }
