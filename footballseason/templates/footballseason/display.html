@@ -14,7 +14,7 @@
 {% if games_list %}
 	<table id="games">
 	{% for game in games_list %}
-		<tr>
+        <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
 			<td class="teams">
 				<b>{{ game.away_team }}</b>
 			</td>
@@ -25,7 +25,7 @@
 				<b>{{ game.home_team }}</b>
 			</td>
 		</tr>
-		<tr>
+        <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
 			<td class="record">
 				{{ game.away_team|display_record }}
 			</td>
@@ -36,7 +36,7 @@
 				{{game.home_team|display_record}}
 			</td>
 		</tr>
-		<tr>
+        <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
 			<td class="picks">
 				{% for pick in game.pick_set.all %}
 				{% if pick.team_to_win == game.away_team %}
@@ -54,7 +54,6 @@
 				{% endfor %}
 			</td>
 		</tr>
-		<tr class="blank"><td colspan=3>&nbsp;</td></tr>
 	{% endfor %}
 	</table>
 {% else %}
