@@ -16,6 +16,7 @@
 	{% for game in games_list %}
 		<input type="radio" name="game{{ forloop.counter }}" id="away_team{{ forloop.counter }}" value="{{ game.away_team.id }}" />
 		<label for="away_team{{ forloop.counter }}">{{ game.away_team.team_name }} ({{game.away_team.wins}}-{{game.away_team.loses}}-{{game.away_team.ties}})</label><br />
+		<span class=at>&emsp; at </span><br />
 		<input type="radio" name="game{{ forloop.counter }}" id="home_team{{ forloop.counter }}" value="{{ game.home_team.id }}" />
 		<label for="home_team{{ forloop.counter }}">{{ game.home_team.team_name }} ({{game.home_team.wins}}-{{game.home_team.loses}}-{{game.home_team.ties}})</label><br /><br />
 	{% endfor %}
