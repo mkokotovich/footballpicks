@@ -12,61 +12,61 @@
 <div class="gamelist">
 <br>
 {% if games_list %}
-	<table id="games">
-	{% for game in games_list %}
+    <table id="games">
+    {% for game in games_list %}
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
-			<td class="teams">
-				<b>{{ game.away_team }}</b>
-			</td>
-			<td class="at">
-				at
-			</td>
-			<td class="teams">
-				<b>{{ game.home_team }}</b>
-			</td>
-		</tr>
+            <td class="teams">
+                <b>{{ game.away_team }}</b>
+            </td>
+            <td class="at">
+                at
+            </td>
+            <td class="teams">
+                <b>{{ game.home_team }}</b>
+            </td>
+        </tr>
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
-			<td class="record">
-				{{ game.away_team|display_record }}
-			</td>
-			<td class="gametime">
-				{{ game|display_gametime }}
-			</td>
-			<td class="record">
-				{{game.home_team|display_record}}
-			</td>
-		</tr>
+            <td class="record">
+                {{ game.away_team|display_record }}
+            </td>
+            <td class="gametime">
+                {{ game|display_gametime }}
+            </td>
+            <td class="record">
+                {{game.home_team|display_record}}
+            </td>
+        </tr>
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
-			<td class="picks">
-				{% for pick in game.pick_set.all %}
-				{% if pick.team_to_win == game.away_team %}
-				{{ pick.user_name }} &nbsp;
-				{% endif %}
-				{% endfor %}
-			</td>
-			<td>
-			</td>
-			<td class="picks">
-				{% for pick in game.pick_set.all %}
-				{% if pick.team_to_win == game.home_team %}
-				{{ pick.user_name }} &nbsp;
-				{% endif %}
-				{% endfor %}
-			</td>
-		</tr>
-	{% endfor %}
-	</table>
+            <td class="picks">
+                {% for pick in game.pick_set.all %}
+                {% if pick.team_to_win == game.away_team %}
+                {{ pick.user_name }} &nbsp;
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+            </td>
+            <td class="picks">
+                {% for pick in game.pick_set.all %}
+                {% if pick.team_to_win == game.home_team %}
+                {{ pick.user_name }} &nbsp;
+                {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
 {% else %}
-	<p>No games added.</p>
+    <p>No games added.</p>
 {% endif %}
 </div>
 
 <div>
 <h3>View picks for week:</h3>
 {% for i in 17|get_range %}
-	{% with week=i|add:"1" %}
-	<a href="{% url 'footballseason:display' week %}">{{ week }} </a> &emsp;
-	{% endwith %}
+    {% with week=i|add:"1" %}
+    <a href="{% url 'footballseason:display' week %}">{{ week }} </a> &emsp;
+    {% endwith %}
 {% endfor %}
 <br><br>
 </div>
