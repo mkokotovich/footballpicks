@@ -6,6 +6,13 @@ class Team(models.Model):
 	loses = models.IntegerField(default=0)
 	ties = models.IntegerField(default=0)
 
+	def record(self):
+		if (self.ties == 0):
+			recordstr = "({0}-{1})".format(self.wins, self.loses)
+		else:
+			recordstr = "({0}-{1}-{2})".format(self.wins, self.loses, self.ties)
+		return recordstr
+
 	def __str__(self):
 		return self.team_name
 

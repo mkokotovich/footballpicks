@@ -1,6 +1,7 @@
 {% extends "footballseason/base.html" %}
 
 {% load get_range %}
+{% load fbfilters %}
 
 {% block content %}
 
@@ -14,7 +15,7 @@
 	{% for game in games_list %}
 		<tr>
 		<td>
-			<b>{{ game.away_team }}</b> ({{game.away_team.wins}}-{{game.away_team.loses}}-{{game.away_team.ties}})
+            <b>{{ game.away_team }}</b> {{ game.away_team|display_record }}
 		</td>
 		<td>
 		{% for pick in game.pick_set.all %}
@@ -32,7 +33,7 @@
 		</tr>
 		<tr class="home">
 		<td>
-			<b>{{ game.home_team }}</b> ({{game.home_team.wins}}-{{game.home_team.loses}}-{{game.home_team.ties}})
+			<b>{{ game.home_team }}</b> {{game.home_team|display_record}}
 		</td>
 		<td>
 		{% for pick in game.pick_set.all %}
