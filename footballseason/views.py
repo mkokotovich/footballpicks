@@ -11,11 +11,12 @@ from .models import Game, Team, Pick
 
 # constant - the start of "week 1", the tuesday before the first game
 week1_start = datetime(2015,9,8,0,0,0)
+def get_week():
+	tdelta = datetime.now() - week1_start
+	return ceil((tdelta.total_seconds()/(60*60*24))/7)
 
 def index(request):
-	tdelta = datetime.now() - week1_start
-	current_week = ceil((tdelta.total_seconds()/(60*60*24))/7)
-	context = { 'current_week': current_week}
+	context = { 'current_week': get_week()}
 	return render(request, 'footballseason/index.html', context)
 
 def display(request, week_id):

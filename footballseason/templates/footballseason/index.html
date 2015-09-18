@@ -13,13 +13,17 @@
 <h3>Or submit picks for week:</h3>
 {% for i in 17|get_range %}
     {% with week=i|add:"1" %}
-    {% if week == current_week %}
-    <span class=currentweek>
-    {% endif %}
-    <a href="{% url 'footballseason:submit' week %}">{{ week }} </a> &emsp; 
-    {% if week == current_week %}
-    </span>
-    {% endif %}
+        {% if week < current_week %}
+            {{ week }} &emsp; 
+        {% else %}
+            {% if week == current_week %}
+                <span class=currentweek>
+            {% endif %}
+            <a href="{% url 'footballseason:submit' week %}">{{ week }} </a> &emsp; 
+            {% if week == current_week %}
+                </span>
+            {% endif %}
+        {% endif %}
     {% endwith %}
 {% endfor %}
 
