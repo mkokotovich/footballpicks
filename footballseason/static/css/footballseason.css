@@ -35,28 +35,35 @@ h1, h2, h3, h4 {
     margin-bottom: 70px;
 }
 
+table, th, td {
+       border: 0px solid black;
+   }
+
 #games {
     border-collapse: collapse;
 }
 
 #games td {
-    padding: 3px 7px 2px 7px;
-    background-color: #9FE09F;
+    padding: 0px 20px 0px 20px;
+    text-align: center;
+    white-space: nowrap;
 }
 
-#games tr.at td {
-    padding: 0px 7px 0px 7px;
+#games td.teams {
+    font-size: 1.5em;
+}
+
+#games td.at {
+    padding: 3px 7px 0px 7px;
     font-size: 0.875em;
-    background-color: #FFFFFF;
 }
 
-.currentweek {
-    font-size: 1.25em;
-    font-weight: bold;
+#games td.picks {
+    padding: 4px 20px 0px 20px;
 }
-
-#games tr.home td {
-    background-color: #9FC0E0;
+#games td.gametime {
+    padding: 0px 20px 0px 20px;
+    font-size: 0.875em;
 }
 
 #games tr.blank td {
@@ -64,4 +71,8 @@ h1, h2, h3, h4 {
     background-color: #FFFFFF;
 }
 
+.currentweek {
+    font-size: 1.25em;
+    font-weight: bold;
+}
 

@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import timezone
 
 class Team(models.Model):
 	team_name = models.CharField(max_length=200)
@@ -21,6 +22,13 @@ class Game(models.Model):
 	home_team = models.ForeignKey(Team, related_name='game_home_team')
 	away_team = models.ForeignKey(Team, related_name='game_away_team')
 	game_time = models.DateTimeField('Game time')
+
+	def gametime(self):
+		try:
+			gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 
+		except NameError:
+			gametimestr = ""
+		return gametimestr
 
 	def __str__(self):
 		return "wk %d: %s at %s" % (self.week, self.away_team, self.home_team)
