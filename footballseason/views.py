@@ -11,6 +11,7 @@ from .models import Game, Team, Pick
 
 # constant - the start of "week 1", the tuesday before the first game
 week1_start = datetime(2015,9,8,0,0,0)
+
 def get_week():
 	tdelta = datetime.now() - week1_start
 	return int(ceil((tdelta.total_seconds()/(60*60*24))/7))
