@@ -13,7 +13,7 @@ from .models import Game, Team, Pick
 week1_start = datetime(2015,9,8,0,0,0)
 def get_week():
 	tdelta = datetime.now() - week1_start
-	return ceil((tdelta.total_seconds()/(60*60*24))/7)
+	return int(ceil((tdelta.total_seconds()/(60*60*24))/7))
 
 def index(request):
 	context = { 'current_week': get_week()}
