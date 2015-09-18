@@ -5,6 +5,7 @@
 
 <div>
 <h1>Submit picks for week {{ week_id }}</h1>
+<br>
 </div>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -14,20 +15,42 @@
 
 <form action="{% url 'footballseason:vote' week_id %}" method="post">
 	{% csrf_token %}
+	<table id="games">
 	{% for game in games_list %}
-		<input type="radio" name="game{{ forloop.counter }}" id="away_team{{ forloop.counter }}" value="{{ game.away_team.id }}" />
-		<label for="away_team{{ forloop.counter }}">{{ game.away_team.team_name }} {{game.away_team|display_record}}</label><br />
-		<span class=at>&emsp; at </span><br />
-		<input type="radio" name="game{{ forloop.counter }}" id="home_team{{ forloop.counter }}" value="{{ game.home_team.id }}" />
-		<label for="home_team{{ forloop.counter }}">{{ game.home_team.team_name }} {{game.home_team|display_record}}</label><br /><br />
+		<tr>
+			<td class="teams">
+				<input type="radio" name="game{{ forloop.counter }}" id="away_team{{ forloop.counter }}" value="{{ game.away_team.id }}" />
+				<label for="away_team{{ forloop.counter }}">{{ game.away_team }}</label><br />
+			</td>
+			<td class="at">
+				at
+			</td>
+			<td class="teams">
+				<input type="radio" name="game{{ forloop.counter }}" id="home_team{{ forloop.counter }}" value="{{ game.home_team.id }}" />
+				<label for="home_team{{ forloop.counter }}">{{ game.home_team }}</label><br />
+			</td>
+		</tr>
+		<tr>
+			<td class="record">
+				{{ game.away_team|display_record }}
+			</td>
+			<td class="gametime">
+				{{ game|display_gametime }}
+			</td>
+			<td class="record">
+				{{game.home_team|display_record}}
+			</td>
+		</tr>
+		<tr class="blank"><td colspan=3>&nbsp;</td></tr>
 	{% endfor %}
+	</table>
 
 	<input type="submit" value="Vote" />
 </form>
-
 {% else %}
-    <p>No games added</p>
+	<p>No games added.</p>
 {% endif %}
+
 </div>
 
 {% endblock content %}
