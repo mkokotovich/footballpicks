@@ -34,6 +34,7 @@ def submit(request, week_id):
 def vote(request, week_id):
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
     name=request.user.first_name
+    date_submitted = timezone.now()
     for index, game in enumerate(games_list):
         try:
             selected_team_id=int(request.POST["game%d" % (index+1)])
@@ -52,15 +53,22 @@ def vote(request, week_id):
             return HttpResponseRedirect(reverse('footballseason:display', args=(week_id,)))
 
         if (selected_team_id != 0):
+            # Check for an illegal pick
+            if (game.game_time < date_submitted):
+                error="Picking a game ({0}) after the game time is not allowed. Please choose another game.".format(game)
+                print(error)
+                context = { 'error_message': error, 'games_list': games_list, 'week_id': week_id}
+                return render(request, 'footballseason/submit.html', context)
+
             # A team was selected, first look to see if a pick already exists
             try:
                 pick = game.pick_set.get(user_name=name)
                 # An existing pick was found, update selection
                 pick.team_to_win=team_selected
-                pick.date_submitted=timezone.now()
+                pick.date_submitted=date_submitted
             except ObjectDoesNotExist:
                 # No existing pick found, create new pick
-                pick = Pick(user_name=name, game=game, team_to_win=team_selected, date_submitted=timezone.now())
+                pick = Pick(user_name=name, game=game, team_to_win=team_selected, date_submitted=date_submitted)
 
             pick.save()
 

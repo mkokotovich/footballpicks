@@ -31,7 +31,7 @@ class Game(models.Model):
         return gametimestr
 
     def __str__(self):
-        return "wk %d: %s at %s" % (self.week, self.away_team, self.home_team)
+        return "Week %d: %s at %s" % (self.week, self.away_team, self.home_team)
 
 class Pick(models.Model):
     user_name = models.CharField(max_length=200)

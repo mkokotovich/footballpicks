@@ -8,7 +8,10 @@
 <br>
 </div>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+{% if error_message %}
+<div class="isa_error"> {{ error_message }} </div>
+<br>
+{% endif %}
 
 <div>
 {% if games_list %}
