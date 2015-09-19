@@ -81,7 +81,8 @@ def read_game_info():
 
         games.append(Game(week, awayteam, hometeam, gametime))
 
-DATABASE_URL="postgres://jjzwrulyelxmem:dSFKNdrKhxBupS3eJZPkQuKgJ4@ec2-54-204-20-164.compute-1.amazonaws.com:5432/d8cq541fs49168"
+# Run heroku config -s to get production DATABASE_URL
+DATABASE_URL=""
 #DATABASE_URL="postgres://postgresusr:postgrespwd@localhost:5432/fbpicks"
 
 def build_team_ids():

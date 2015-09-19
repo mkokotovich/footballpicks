@@ -4,13 +4,23 @@
 
 <div>
 <h1> Welcome to Football Picks Week {{current_week}}</h1>
-<br><br>
+<br>
 </div>
 
-{% load get_range %}
-<h2>Submit picks for <a href="{% url 'footballseason:submit' current_week %}">current week</a></h2>
+{% if error_message %}
+<div class="isa_error"> {{ error_message }} </div>
 <br>
-<h3>Or submit picks for week:</h3>
+{% endif %}
+
+{% if info_message %}
+<div class="isa_info"> {{ info_message }} </div>
+<br>
+{% endif %}
+
+{% load get_range %}
+<h2><a href="{% url 'footballseason:display' current_week %}">View</a> or <a href="{% url 'footballseason:submit' current_week %}">submit</a> picks for current week</h2>
+<br>
+<h3>Submit picks for week:</h3>
 {% for i in 17|get_range %}
     {% with week=i|add:"1" %}
         {% if week < current_week %}
@@ -29,7 +39,7 @@
 
 <br><br>
 
-<h2>View picks for week:</h2>
+<h3>View picks for week:</h3>
 {% for i in 17|get_range %}
     {% with week=i|add:"1" %}
     {% if week == current_week %}

@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from math import ceil
+from bs4 import BeautifulSoup
+import urllib.request
 
 from .models import Game, Team, Pick
 
@@ -76,4 +78,40 @@ def vote(request, week_id):
     # with POST data. This prevents data from being posted twice if a
     # user hits the Back button.
     return HttpResponseRedirect(reverse('footballseason:display', args=(week_id,)))
+
+def update(request):
+    message_type = 'info_message'
+    message = "Successfully updated standings"
+
+    url = "http://www.usatoday.com/sports/nfl/standings/"
+    with urllib.request.urlopen(url) as response:
+        html = response.read()
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # For each division:
+    for node in soup.find_all('table'):
+        for row in node.find_all('tr'):
+            teamname = row.find('th').text.strip()
+            cols = row.find_all('td')
+            if (len(cols) < 3):
+                continue
+            wins = int(cols[0].text)
+            loses = int(cols[1].text)
+            ties = int(cols[2].text)
+            try:
+                team = Team.objects.get(team_name=teamname)
+                # An existing team was found, update standings
+                team.wins=wins
+                team.loses=loses
+                team.ties=ties
+                team.save()
+            except ObjectDoesNotExist:
+                # Could not find team, this shouldn't happen
+                if (message_type != 'error_message'):
+                    message_type = 'error_message'
+                    message = ""
+                message += "Could not find team {0}, could not update standings\n".format(teamname)
+
+    context = { message_type: message, 'current_week': get_week()}
+    return render(request, 'footballseason/index.html', context)
 

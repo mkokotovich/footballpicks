@@ -14,4 +14,7 @@ urlpatterns = [
 
     # eg: /footballseason/3/vote
     url(r'^(?P<week_id>[0-9]+)/vote$', views.vote, name='vote'),
+
+    # eg: /footballseason/update
+    url(r'^update$', views.update, name='update'),
 ]
