@@ -8,12 +8,13 @@
 <br>
 </div>
 
+<div>
+
 {% if error_message %}
 <div class="isa_error"> {{ error_message }} </div>
 <br>
 {% endif %}
 
-<div>
 {% if games_list %}
 
 <form action="{% url 'footballseason:vote' week_id %}" method="post">
