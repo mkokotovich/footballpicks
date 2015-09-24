@@ -41,3 +41,12 @@ class Pick(models.Model):
 
     def __str__(self):
         return "%s picks %s to win" % (self.user_name, self.team_to_win)
+
+class Record(models.Model):
+    user_name = models.CharField(max_length=200)
+    season = models.IntegerField(default=0)
+    week = models.IntegerField(default=0)
+    wins = models.IntegerField(default=0)
+
+    def __str__(self):
+        return "%s has %d wins in week %d of the %d season" % (self.user_name, self.wins, self.week, self.season)

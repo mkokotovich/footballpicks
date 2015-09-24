@@ -17,4 +17,10 @@ urlpatterns = [
 
     # eg: /footballseason/update
     url(r'^update$', views.update, name='update'),
+
+    # eg: /footballseason/records/2015
+    url(r'^records/(?P<season>[0-9]+)$', views.records_by_season, name='records_by_season'),
+
+    # eg: /footballseason/records/2015/3
+    url(r'^records/(?P<season>[0-9]+)/(?P<week>[0-9]+)$', views.records_by_week, name='records_by_week'),
 ]

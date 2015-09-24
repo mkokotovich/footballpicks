@@ -1,0 +1,38 @@
+{% extends "footballseason/base.html" %}
+
+{% load get_range %}
+{% load fbfilters %}
+
+{% block content %}
+
+<div>
+    {% if week %}
+    <h1>Records for week {{ week }} of the {{ season }} season</h1>
+    {% else %}
+    <h1>Records for the {{ season }} season</h1>
+    {% endif %}
+</div>
+
+<div class="records">
+<br>
+{% for record in record_list %}
+{{ record }}
+{% endfor %}
+</div>
+
+<div>
+    {% if week %}
+    <h3>View records for week:</h3>
+    {% for i in 17|get_range %}
+    {% with week=i|add:"1" %}
+    <a href="{% url 'footballseason:records_by_week' season week %}">{{ week }} </a> &emsp;
+    {% endwith %}
+    {% endfor %}
+    {% else %}
+    <h3>View records for season:</h3>
+    <a href="{% url 'footballseason:records_by_season' 2015 %}">2015</a> &emsp;
+    {% endif %}
+<br><br>
+</div>
+
+{% endblock content %}

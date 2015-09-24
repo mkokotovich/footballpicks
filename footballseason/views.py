@@ -4,12 +4,13 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from datetime import datetime
 from math import ceil
 from bs4 import BeautifulSoup
 import urllib.request
 
-from .models import Game, Team, Pick
+from .models import Game, Team, Pick, Record
 
 # constant - the start of "week 1", the tuesday before the first game
 week1_start = datetime(2015,9,8,0,0,0)
@@ -17,6 +18,27 @@ week1_start = datetime(2015,9,8,0,0,0)
 def get_week():
     tdelta = datetime.now() - week1_start
     return int(ceil((tdelta.total_seconds()/(60*60*24))/7))
+
+def get_last_game_for_team(team):
+    #TODO
+    return get_week()-1
+
+def update_records(team):
+    last_game_week = get_last_game_for_team(team)
+    try:
+        game = Game.objects.get(Q(week=last_game_week) & (Q(home_team=team) | Q(away_team=team)))
+    except:
+        # Error
+        print("Error: Unable to find game to update records. Team: %s, last_game_week %d".format(team, last_game_week))
+        return 0
+
+    winning_picks = game.pick_set.filter(team_to_win=team)
+    for pick in winning_picks:
+        try:
+            record = Record.objects.get(user_name=pick.user_name, season=2015, week=last_game_week)
+        except:
+            record = Record(user_name=pick.user_name, season=2015, week=last_game_week);
+        record.wins += 1
 
 def index(request):
     context = { 'current_week': get_week()}
@@ -101,6 +123,9 @@ def update(request):
             try:
                 team = Team.objects.get(team_name=teamname)
                 # An existing team was found, update standings
+                if (team.wins < wins):
+                    # This team won, update records. Assuming we update at least once a week
+                    update_records(team)
                 team.wins=wins
                 team.loses=loses
                 team.ties=ties
@@ -115,3 +140,12 @@ def update(request):
     context = { message_type: message, 'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
 
+def records_by_week(request, season, week):
+    record_list = Record.objects.filter(season=season, week=week)
+    context = {'record_list': record_list, 'season': season, 'week': week }
+    return render(request, 'footballseason/records.html', context)
+
+def records_by_season(request, season):
+    record_list = Record.objects.filter(season=season)
+    context = {'record_list': record_list, 'season': season}
+    return render(request, 'footballseason/records.html', context)
