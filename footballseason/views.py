@@ -19,26 +19,40 @@ def get_week():
     tdelta = datetime.now() - week1_start
     return int(ceil((tdelta.total_seconds()/(60*60*24))/7))
 
-def get_last_game_for_team(team):
-    #TODO
-    return get_week()-1
+def get_last_game_for_team(team, f):
+    games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('game_time')
+    if (len(games) == 0):
+        print("Error: unable to find last game for team {0}".format(team))
+        return None
+    f.write("DEBUG: after games, len {0}\n".format(len(games)))
+    last_game = games[0]
+    f.write("DEBUG: last game {0}\n".format(last_game))
+    return last_game
 
 def update_records(team):
-    last_game_week = get_last_game_for_team(team)
+    f = open('mattdebug.log', 'a')
+    f.write("enter update_records\n")
     try:
-        game = Game.objects.get(Q(week=last_game_week) & (Q(home_team=team) | Q(away_team=team)))
+        f.write("before get_last_game\n")
+        last_game = get_last_game_for_team(team, f)
+        f.write("after get_last_game\n")
+        last_game_week = last_game.week
+        f.write("after week\n")
     except:
         # Error
-        print("Error: Unable to find game to update records. Team: %s, last_game_week %d".format(team, last_game_week))
+        print("Error: Unable to find game to update records. Team: {0}".format(team))
         return 0
 
-    winning_picks = game.pick_set.filter(team_to_win=team)
+    f.write("close\n")
+    f.close()
+    winning_picks = last_game.pick_set.filter(team_to_win=team)
     for pick in winning_picks:
         try:
             record = Record.objects.get(user_name=pick.user_name, season=2015, week=last_game_week)
         except:
-            record = Record(user_name=pick.user_name, season=2015, week=last_game_week);
+            record = Record(user_name=pick.user_name, season=2015, week=last_game_week, wins=0);
         record.wins += 1
+        record.save()
 
 def index(request):
     context = { 'current_week': get_week()}
@@ -141,11 +155,11 @@ def update(request):
     return render(request, 'footballseason/index.html', context)
 
 def records_by_week(request, season, week):
-    record_list = Record.objects.filter(season=season, week=week)
+    record_list = Record.objects.filter(season=season, week=week).order_by('-wins')
     context = {'record_list': record_list, 'season': season, 'week': week }
     return render(request, 'footballseason/records.html', context)
 
 def records_by_season(request, season):
-    record_list = Record.objects.filter(season=season)
+    record_list = Record.objects.filter(season=season).order_by('-wins')
     context = {'record_list': record_list, 'season': season}
     return render(request, 'footballseason/records.html', context)

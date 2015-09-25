@@ -15,23 +15,29 @@
 
 <div class="records">
 <br>
-{% for record in record_list %}
-{{ record }}
-{% endfor %}
+    <table id="recordtable">
+        {% for record in record_list %}
+        <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
+            <td class="name">
+                {{ record.user_name }}
+            </td>
+            <td class="record">
+                {{ record.wins }} wins
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 
 <div>
-    {% if week %}
-    <h3>View records for week:</h3>
-    {% for i in 17|get_range %}
-    {% with week=i|add:"1" %}
-    <a href="{% url 'footballseason:records_by_week' season week %}">{{ week }} </a> &emsp;
-    {% endwith %}
-    {% endfor %}
-    {% else %}
     <h3>View records for season:</h3>
     <a href="{% url 'footballseason:records_by_season' 2015 %}">2015</a> &emsp;
-    {% endif %}
+    <h3>View records for season {{season}}, week:</h3>
+    {% for i in 17|get_range %}
+        {% with week=i|add:"1" %}
+        <a href="{% url 'footballseason:records_by_week' season week %}">{{ week }} </a> &emsp;
+        {% endwith %}
+    {% endfor %}
 <br><br>
 </div>
 

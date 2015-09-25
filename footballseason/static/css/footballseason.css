@@ -71,7 +71,7 @@ table, th, td {
     border-collapse: collapse;
 }
 
-#games td {
+table td {
     padding: 0px 10px 0px 10px;
     text-align: center;
     white-space: nowrap;
@@ -97,11 +97,20 @@ table, th, td {
     font-size: 0.875em;
 }
 
-#games tr.base td {
+#recordtable td.name {
+    padding: 5px 10px 5px 10px;
+    text-align: left;
+}
+
+#recordtable td.record {
+    padding: 5px 10px 5px 10px;
+}
+
+table tr.base td {
     background-color: #FFFFFF;
 }
 
-#games tr.alt td {
+table tr.alt td {
     background-color: #D9D9D9;
 }
 
