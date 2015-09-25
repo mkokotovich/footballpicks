@@ -25,7 +25,12 @@ class Game(models.Model):
 
     def gametime(self):
         try:
-            gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 
+            # Week two was entered manually and has to be treated differently
+            if (self.week <= 2):
+                gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 
+            else:
+                gametimestr = self.game_time.strftime("%b %d, %I:%M %p") 
+
         except NameError:
             gametimestr = ""
         return gametimestr

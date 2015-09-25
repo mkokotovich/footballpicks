@@ -63,7 +63,8 @@ def submit(request, week_id):
 def vote(request, week_id):
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
     name=request.user.first_name
-    date_submitted = timezone.now()
+    # Game times were entered with a local timezone
+    date_submitted = timezone.localtime(timezone.now())
     for index, game in enumerate(games_list):
         try:
             selected_team_id=int(request.POST["game%d" % (index+1)])
