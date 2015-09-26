@@ -5,15 +5,21 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.db.models import Sum
+from django.contrib.auth.models import User
 from datetime import datetime
 from math import ceil
 from bs4 import BeautifulSoup
 import urllib.request
+import operator
 
 from .models import Game, Team, Pick, Record
 
 # constant - the start of "week 1", the tuesday before the first game
 week1_start = datetime(2015,9,8,0,0,0)
+
+def get_season():
+    return int(2015)
 
 def get_week():
     tdelta = datetime.now() - week1_start
@@ -146,12 +152,22 @@ def update(request):
     context = { message_type: message, 'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
 
+def records_default(request):
+    return records_by_week(request, get_season(), get_week())
+
 def records_by_week(request, season, week):
     record_list = Record.objects.filter(season=season, week=week).order_by('-wins')
     context = {'record_list': record_list, 'season': season, 'week': week }
     return render(request, 'footballseason/records.html', context)
 
 def records_by_season(request, season):
-    record_list = Record.objects.filter(season=season).order_by('-wins')
-    context = {'record_list': record_list, 'season': season}
+    aggregate_dict = {}
+    all_users = User.objects.all()
+    for each_user in all_users:
+        if (each_user.username == 'admin'):
+            continue
+        win_sum = sum([i.wins for i in Record.objects.filter(season=season, user_name=each_user.first_name)])
+        aggregate_dict[each_user.first_name] = win_sum
+    season_totals = sorted(aggregate_dict.items(), key=operator.itemgetter(1), reverse=True)
+    context = {'season_totals': season_totals, 'season': season}
     return render(request, 'footballseason/records.html', context)
