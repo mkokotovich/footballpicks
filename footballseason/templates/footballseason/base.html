@@ -13,6 +13,8 @@
     </div>
     <div class="user-header">
         {% if user.is_authenticated %}
+            {{ user.first_name }}
+            <br>
             <a href="/logout">Logout</a>
         {% else %}
             <a href="/login">Login</a>

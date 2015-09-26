@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db.models import Sum
 from django.contrib.auth.models import User
+from django.contrib import messages
 from datetime import datetime
 from math import ceil
 from bs4 import BeautifulSoup
@@ -71,6 +72,7 @@ def vote(request, week_id):
     name=request.user.first_name
     # Game times were entered with a local timezone
     date_submitted = timezone.localtime(timezone.now())
+    successful_submissions = 0
     for index, game in enumerate(games_list):
         try:
             selected_team_id=int(request.POST["game%d" % (index+1)])
@@ -91,10 +93,10 @@ def vote(request, week_id):
         if (selected_team_id != 0):
             # Check for an illegal pick
             if (game.game_time < date_submitted):
-                error="Picking a game ({0}) after the game time is not allowed. Please choose another game.".format(game)
-                print(error)
-                context = { 'error_message': error, 'games_list': games_list, 'week_id': week_id}
-                return render(request, 'footballseason/submit.html', context)
+                errormsg="Unable to submit pick for ({0}), game already started.".format(game)
+                print(errormsg)
+                messages.error(request, errormsg)
+                continue
 
             # A team was selected, first look to see if a pick already exists
             try:
@@ -107,6 +109,12 @@ def vote(request, week_id):
                 pick = Pick(user_name=name, game=game, team_to_win=team_selected, date_submitted=date_submitted)
 
             pick.save()
+            successful_submissions += 1
+
+    if (successful_submissions > 0):
+        infomsg = "Successfully submitted {0} picks for {1}".format(successful_submissions, request.user.first_name)
+        print(infomsg)
+        messages.success(request, infomsg)
 
     # Always return an HttpResponseRedirect after successfully dealing
     # with POST data. This prevents data from being posted twice if a
@@ -114,13 +122,11 @@ def vote(request, week_id):
     return HttpResponseRedirect(reverse('footballseason:display', args=(week_id,)))
 
 def update(request):
-    message_type = 'info_message'
-    message = "Successfully updated standings"
-
     url = "http://www.usatoday.com/sports/nfl/standings/"
     with urllib.request.urlopen(url) as response:
         html = response.read()
     soup = BeautifulSoup(html, 'html.parser')
+    failure = 0
 
     # For each division:
     for node in soup.find_all('table'):
@@ -144,12 +150,17 @@ def update(request):
                 team.save()
             except ObjectDoesNotExist:
                 # Could not find team, this shouldn't happen
-                if (message_type != 'error_message'):
-                    message_type = 'error_message'
-                    message = ""
-                message += "Could not find team {0}, could not update standings\n".format(teamname)
+                errormsg = "Could not find team {0}, could not update standings".format(teamname)
+                print(errormsg)
+                messages.error(request, errormsg)
+                failure=1
 
-    context = { message_type: message, 'current_week': get_week()}
+    if (failure == 0):
+        infomsg = "Successfully updated standings"
+        print(infomsg)
+        messages.success(request, infomsg)
+
+    context = { 'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
 
 def records_default(request):

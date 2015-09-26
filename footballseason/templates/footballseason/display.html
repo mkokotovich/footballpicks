@@ -9,6 +9,18 @@
 <h1>Games for week {{ week_id }}</h1>
 </div>
 
+{% if messages %}
+    {% for message in messages %}
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <div class="isa_error"> {{ message }} </div>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+        <div class="isa_info"> {{ message }} </div>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+        <div class="isa_success"> {{ message }} </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 <div class="gamelist">
 <br>
 {% if games_list %}
