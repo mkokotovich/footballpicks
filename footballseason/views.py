@@ -132,6 +132,7 @@ def update(request):
         html = response.read()
     soup = BeautifulSoup(html, 'html.parser')
     failure = 0
+    successful_updates = 0
 
     # For each division:
     for node in soup.find_all('table'):
@@ -146,6 +147,9 @@ def update(request):
             try:
                 team = Team.objects.get(team_name=teamname)
                 # An existing team was found, update standings
+                if (team.wins != wins or team.loses != loses or team.ties != ties):
+                    successful_updates += 1
+
                 if (team.wins < wins):
                     # This team won, update records. Assuming we update at least once a week
                     update_records(team)
@@ -161,9 +165,13 @@ def update(request):
                 failure=1
 
     if (failure == 0):
-        infomsg = "Successfully updated standings"
+        if (successful_updates > 0):
+            infomsg = "Successfully updated standings for {0} teams".format(successful_updates)
+            messages.success(request, infomsg)
+        else:
+            infomsg = "No updates available"
+            messages.info(request, infomsg)
         print(infomsg)
-        messages.success(request, infomsg)
 
     context = { 'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
