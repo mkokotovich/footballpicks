@@ -1,14 +1,13 @@
 {% extends "footballseason/base.html" %}
+
+{% load get_range %}
 {% load fbfilters %}
 
 {% block content %}
 
 <div>
-<h1>Submit picks for week {{ week_id }}</h1>
-<br>
+<h1>Live scores</h1>
 </div>
-
-<div>
 
 {% if messages %}
     {% for message in messages %}
@@ -22,54 +21,56 @@
     {% endfor %}
 {% endif %}
 
-{% if error_message %}
-<div class="isa_error"> {{ error_message }} </div>
+<div class="gamelist">
 <br>
-{% endif %}
-
-{% if games_list %}
-
-<form action="{% url 'footballseason:vote' week_id %}" method="post">
-    {% csrf_token %}
+{% if live_list %}
     <table id="games">
-    {% for game in games_list %}
+    {% for entry in live_list %}
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
             <td class="teams">
-                <input type="radio" name="game{{ forloop.counter }}" id="away_team{{ forloop.counter }}" value="{{ game.away_team.id }}" />
-                <label for="away_team{{ forloop.counter }}">{{ game.away_team }}</label><br />
+                <b>{{ entry.0.away_team }}</b>
             </td>
-            <td class="at">
-                at
+            <td class="score">
+                {{ entry.1.1 }} - {{ entry.1.3 }}
             </td>
             <td class="teams">
-                <input type="radio" name="game{{ forloop.counter }}" id="home_team{{ forloop.counter }}" value="{{ game.home_team.id }}" />
-                <label for="home_team{{ forloop.counter }}">{{ game.home_team }}</label><br />
+                <b>{{ entry.0.home_team }}</b>
             </td>
         </tr>
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
             <td class="record">
-                {{ game.away_team|display_record }}
+                {{ entry.0.away_team|display_record }}
             </td>
             <td class="gametime">
-                {{ game|display_gametime }}
+                {{ entry.1.4 }}
             </td>
             <td class="record">
-                {{game.home_team|display_record}}
+                {{entry.0.home_team|display_record}}
             </td>
         </tr>
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
-            <td class="picks" colspan=3></td>
+            <td class="picks">
+                {% for pick in entry.0.pick_set.all %}
+                {% if pick.team_to_win == entry.0.away_team %}
+                {{ pick.user_name }} &nbsp;
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+            </td>
+            <td class="picks">
+                {% for pick in entry.0.pick_set.all %}
+                {% if pick.team_to_win == entry.0.home_team %}
+                {{ pick.user_name }} &nbsp;
+                {% endif %}
+                {% endfor %}
+            </td>
         </tr>
     {% endfor %}
     </table>
-    <br>
-    <input type="submit" value="Vote" />
-</form>
 {% else %}
     <p>No games added.</p>
 {% endif %}
-<br><br>
-
 </div>
 
 {% endblock content %}

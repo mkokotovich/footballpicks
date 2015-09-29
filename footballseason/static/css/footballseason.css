@@ -29,6 +29,7 @@
 .page-header {
         background-color: #178A11;
         margin-top: 0;
+        margin-bottom: 0;
         padding: 20px 20px 20px 40px;
 }
 
@@ -38,10 +39,29 @@
         text-decoration: none;
 }
 
-.user-header {
+.user-header, .user-header a {
+    padding: 5px 0px 5px 0px;
+    background-color: #D9D9D9;
+    color: inherit;
+    text-decoration: none;
+}
+
+#top-links {
+    width: 100%;
+}
+
+#top-links td.nav {
+    padding: 0px 0px 0px 40px;
+    font-size: 0.9em;
+    text-align: left;
+    float: left;
+}
+
+#top-links td.login {
+    padding: 0px 40px 0px 0px;
+    font-size: 0.9em;
+    text-align: right;
     float: right;
-    width: 100px;
-    padding: 10px;
 }
 
 .content {
@@ -60,7 +80,7 @@ h1, h2, h3, h4 {
 }
 
 .gamelist {
-    margin-bottom: 70px;
+    margin-bottom: 40px;
 }
 
 table, th, td {
@@ -85,6 +105,11 @@ table td {
 #games td.at {
     padding: 20px 7px 0px 7px;
     font-size: 0.875em;
+}
+
+#games td.score {
+    padding: 20px 7px 0px 7px;
+    font-size: 1.25em;
 }
 
 #games td.picks {

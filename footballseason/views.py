@@ -13,6 +13,7 @@ from math import ceil
 from bs4 import BeautifulSoup
 import urllib.request
 import operator
+from footballseason.espn_api import espn_api_v3
 
 from .models import Game, Team, Pick, Record
 
@@ -57,12 +58,16 @@ def index(request):
     return render(request, 'footballseason/index.html', context)
 
 def display(request, week_id):
+    if (week_id == 0):
+        week_id = get_week()
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
     context = { 'games_list': games_list , 'week_id': week_id}
     return render(request, 'footballseason/display.html', context)
 
 @login_required(login_url='/login/')
 def submit(request, week_id):
+    if (week_id == 0):
+        week_id = get_week()
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
     context = { 'games_list': games_list, 'week_id': week_id}
     return render(request, 'footballseason/submit.html', context)
@@ -182,3 +187,18 @@ def records_by_season(request, season):
     season_totals = sorted(aggregate_dict.items(), key=operator.itemgetter(1), reverse=True)
     context = {'season_totals': season_totals, 'season': season}
     return render(request, 'footballseason/records.html', context)
+
+def live(request):
+    week_id = get_week()
+    games_list = Game.objects.order_by('game_time').filter(week=week_id)
+    scores = espn_api_v3.get_scores(espn_api_v3.NFL)
+    live_list = []
+    # sort the scores in the order of our games
+    for game in games_list:
+        for score in scores.values():
+            if (score[0] in game.away_team.team_name):
+                live_list.append((game, score))
+        
+    context = { 'live_list': live_list , 'week_id': week_id}
+    return render(request, 'footballseason/live.html', context)
+
