@@ -13,6 +13,8 @@
     {% for message in messages %}
         {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
         <div class="isa_error"> {{ message }} </div>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+        <div class="isa_warning"> {{ message }} </div>
         {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
         <div class="isa_info"> {{ message }} </div>
         {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}

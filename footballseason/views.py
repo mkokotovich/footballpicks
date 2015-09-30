@@ -97,6 +97,7 @@ def vote(request, week_id):
             selected_team_id=int(request.POST["game%d" % (index+1)])
         except:
             selected_team_id=0
+            messages.warning(request, "No pick entered for {0}".format(game))
 
         if (selected_team_id == game.away_team.id):
             # Away team chosen
