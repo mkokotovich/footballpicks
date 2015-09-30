@@ -176,15 +176,22 @@ def update(request):
     context = { 'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
 
-def records_default(request):
-    return records_by_week(request, get_season(), get_week())
+def records(request, season, week):
+    # Special hack for default view (current week of current season)
+    if (season == 1337 and week == 1337):
+        season = get_season()
+        week = get_week()
 
-def records_by_week(request, season, week):
-    record_list = Record.objects.filter(season=season, week=week).order_by('-wins')
-    context = {'record_list': record_list, 'season': season, 'week': week }
-    return render(request, 'footballseason/records.html', context)
+    if (season == 0):
+        season = get_season()
 
-def records_by_season(request, season):
+    #if a week is supplied, give the week view
+    if (week != 0):
+        record_list = Record.objects.filter(season=season, week=week).order_by('-wins')
+        context = {'record_list': record_list, 'season': season, 'week': week }
+        return render(request, 'footballseason/records.html', context)
+
+    # Otherwise, return the season view
     aggregate_dict = {}
     all_users = User.objects.all()
     for each_user in all_users:
