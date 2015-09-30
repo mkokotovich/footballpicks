@@ -69,7 +69,21 @@ def submit(request, week_id):
     if (week_id == 0):
         week_id = get_week()
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
-    context = { 'games_list': games_list, 'week_id': week_id}
+    game_and_pick_list = []
+    for game in games_list:
+        side = ''
+        try:
+            pick = game.pick_set.get(user_name=request.user.first_name)
+            if (pick.team_to_win == game.home_team):
+                side = 'home'
+            elif (pick.team_to_win == game.away_team):
+                side = 'away'
+        except ObjectDoesNotExist:
+            pass
+
+        game_and_pick_list.append((game, side))
+
+    context = { 'game_and_pick_list': game_and_pick_list, 'week_id': week_id}
     return render(request, 'footballseason/submit.html', context)
 
 def vote(request, week_id):
