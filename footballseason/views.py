@@ -182,6 +182,7 @@ def records(request, season, week):
         season = get_season()
         week = get_week()
 
+    # If season isn't supplied, use the current season
     if (season == 0):
         season = get_season()
 
@@ -211,7 +212,7 @@ def live(request):
     # sort the scores in the order of our games
     for game in games_list:
         for score in scores.values():
-            if (score[0] in game.away_team.team_name):
+            if (score[0] in game.away_team.team_name and score[2] in game.home_team.team_name):
                 live_list.append((game, score))
         
     context = { 'live_list': live_list , 'week_id': week_id}
