@@ -7,7 +7,7 @@ import urllib.request
 
 from footballseason.models import Game, Team, Pick, Record
 
-#Call from CLI via: $ python manage.py < scripts/update_records.py
+#Call from CLI via: $ python manage.py shell < scripts/update_records.py
 
 def get_last_game_for_team(team):
     games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('-game_time')
