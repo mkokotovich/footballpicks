@@ -34,6 +34,15 @@ NBA = 'nba'
 NHL = 'nhl'
 NCAA_BB = 'mens-college-basketball'
 
+def normalize_team_name(team_name):
+    normalized=team_name
+    if (team_name == 'NY Giants'):
+        normalized='New York Giants'
+    elif (team_name == 'NY Jets'):
+        normalized='New York Jets'
+    return normalized
+
+
 def get_scores(league,team_filter=None):
 
         scores = {}
@@ -95,9 +104,9 @@ def get_scores(league,team_filter=None):
                         #add to return dictionary
                         if not team_filter:
                                 scores[gameID] = ['','','','','']
-                                scores[gameID][0] = team1_name
+                                scores[gameID][0] = normalize_team_name(team1_name)
                                 scores[gameID][1] = team1_score
-                                scores[gameID][2] = team2_name
+                                scores[gameID][2] = normalize_team_name(team2_name)
                                 scores[gameID][3] = team2_score
                                 scores[gameID][4] = time
                         elif team1_name.lower() in team_filter or team2_name.lower() in team_filter:
