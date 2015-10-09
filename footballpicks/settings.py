@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -101,6 +102,9 @@ DATABASES = {
 }
 
 DATABASES['default'] =  dj_database_url.config(default='postgres://postgresusr:postgrespwd@localhost/fbpicks')
+#Use sqlite3 for test database
+if ('test' in sys.argv):
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
