@@ -89,8 +89,8 @@ def submit(request, week_id):
 def vote(request, week_id):
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
     name=request.user.first_name
-    # Game times were entered with a local timezone
-    date_submitted = timezone.localtime(timezone.now())
+    #Games were submitted with UTC time, we use timezone.now() to compare to UTC time
+    date_submitted = timezone.now()
     successful_submissions = 0
     for index, game in enumerate(games_list):
         try:
