@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import ceil
 from bs4 import BeautifulSoup
 import urllib.request
@@ -86,10 +86,15 @@ def submit(request, week_id):
     context = { 'game_and_pick_list': game_and_pick_list, 'week_id': week_id}
     return render(request, 'footballseason/submit.html', context)
 
+def pick_is_after_gametime(gametime, date_submitted):
+    # Adjust for UTC issue (gametimes were added in the wrong timezone. Games
+    # that are supposed to start at 7:25PM have a gametime of 2:25PM)
+    adjusted_gametime = gametime + timedelta(hours=5)
+    return (date_submitted > adjusted_gametime)
+
 def vote(request, week_id):
     games_list = Game.objects.order_by('game_time').filter(week=week_id)
     name=request.user.first_name
-    #Games were submitted with UTC time, we use timezone.now() to compare to UTC time
     date_submitted = timezone.now()
     successful_submissions = 0
     for index, game in enumerate(games_list):
@@ -112,7 +117,7 @@ def vote(request, week_id):
 
         if (selected_team_id != 0):
             # Check for an illegal pick
-            if (game.game_time < date_submitted):
+            if (pick_is_after_gametime(game.game_time, date_submitted)):
                 errormsg="Unable to submit pick for ({0}), game already started.".format(game)
                 print(errormsg)
                 messages.error(request, errormsg)
