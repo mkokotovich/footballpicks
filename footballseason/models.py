@@ -18,6 +18,7 @@ class Team(models.Model):
         return self.team_name
 
 class Game(models.Model):
+    season = models.IntegerField(default=0)
     week = models.IntegerField(default=0)
     home_team = models.ForeignKey(Team, related_name='game_home_team')
     away_team = models.ForeignKey(Team, related_name='game_away_team')

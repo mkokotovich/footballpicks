@@ -213,14 +213,22 @@ def records(request, season, week):
         return render(request, 'footballseason/records.html', context)
 
     # Otherwise, return the season view
-    aggregate_dict = {}
+    # 2015 games didnt have a season, change when games do have a season populated
+    game_season = 0
+
+    aggregate_list = [] 
     all_users = User.objects.all()
     for each_user in all_users:
         if (each_user.username == 'admin'):
             continue
         win_sum = sum([i.wins for i in Record.objects.filter(season=season, user_name=each_user.first_name)])
-        aggregate_dict[each_user.first_name] = win_sum
-    season_totals = sorted(aggregate_dict.items(), key=operator.itemgetter(1), reverse=True)
+        total_games = Pick.objects.filter(game__season=game_season, user_name=each_user.first_name).count()
+        if (total_games == 0):
+            continue
+
+        percentage = win_sum / total_games
+        aggregate_list.append((each_user.first_name, win_sum, total_games - win_sum, percentage))
+    season_totals = sorted(aggregate_list, key=lambda record: record[3], reverse=True)
     context = {'season_totals': season_totals, 'season': season}
     return render(request, 'footballseason/records.html', context)
 
