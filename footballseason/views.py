@@ -218,11 +218,12 @@ def records(request, season, week):
 
     aggregate_list = [] 
     all_users = User.objects.all()
+    current_time = timezone.now()
     for each_user in all_users:
         if (each_user.username == 'admin'):
             continue
         win_sum = sum([i.wins for i in Record.objects.filter(season=season, user_name=each_user.first_name)])
-        total_games = Pick.objects.filter(game__season=game_season, user_name=each_user.first_name).count()
+        total_games = Pick.objects.filter(game__season=game_season, game__game_time__lte=current_time, user_name=each_user.first_name).count()
         if (total_games == 0):
             continue
 
