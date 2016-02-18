@@ -17,15 +17,41 @@ from footballseason.espn_api import espn_api_v3
 
 from .models import Game, Team, Pick, Record
 
-# constant - the start of "week 1", the tuesday before the first game
-week1_start = datetime(2015,9,8,0,0,0)
+# the start of "week 1", the tuesday before the first game
+# Not sure of a prettier way to do this
+def get_week1_start():
+    current_season = get_season()
+    if (current_season == 2015):
+        week1_start = datetime(2015,9,8,0,0,0)
+    elif (current_season == 2016):
+        week1_start = datetime(2016,9,6,0,0,0)
+    elif (current_season == 2017):
+        week1_start = datetime(2017,9,5,0,0,0)
+    elif (current_season == 2018):
+        week1_start = datetime(2018,9,4,0,0,0)
+    else:
+        week1_start = datetime(2015,9,8,0,0,0)
+
+    return week1_start
 
 def get_season():
-    return int(2015)
+    now = datetime.now()
+    if (now.month > 1):
+        return now.year
+    else:
+        # Jan and Feb should be in the year prior, to stick to seasons
+        return now.year - 1
 
 def get_week():
-    tdelta = datetime.now() - week1_start
-    return int(ceil((tdelta.total_seconds()/(60*60*24))/7))
+    now = datetime.now()
+    week1_start = get_week1_start()
+    if (now < week1_start):
+        return 1
+    tdelta = now - week1_start
+    week = int(ceil((tdelta.total_seconds()/(60*60*24))/7))
+    if (week > 17):
+        week = 17
+    return week
 
 def get_last_game_for_team(team):
     games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('-game_time')
@@ -54,21 +80,41 @@ def update_records(team):
         record.save()
 
 def index(request):
-    context = { 'current_week': get_week()}
+    context = { 'current_season': get_season(),
+                'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
 
-def display(request, week_id):
+def display(request, season_id, week_id):
+    season_id = int(season_id)
+    week_id = int(week_id)
+    if (season_id == 0):
+        season_id = get_season()
+    filter_season_id = season_id
+    if (season_id == 2015):
+        #First season (2015) didn't have season populated, it is stored as 0
+        filter_season_id = 0
     if (week_id == 0):
         week_id = get_week()
-    games_list = Game.objects.order_by('game_time').filter(week=week_id)
-    context = { 'games_list': games_list , 'week_id': week_id}
+    errormsg="Looking for season {0} and week {1}".format(filter_season_id, week_id)
+    print(errormsg)
+    messages.error(request, errormsg)
+    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
+    context = { 'games_list': games_list , 'season_id': season_id, 'week_id': week_id}
     return render(request, 'footballseason/display.html', context)
 
 @login_required(login_url='/login/')
-def submit(request, week_id):
+def submit(request, season_id, week_id):
+    season_id = int(season_id)
+    week_id = int(week_id)
+    if (season_id == 0):
+        season_id = get_season()
+    filter_season_id = season_id
+    if (season_id == 2015):
+        #First season (2015) didn't have season populated, it is stored as 0
+        filter_season_id = 0
     if (week_id == 0):
         week_id = get_week()
-    games_list = Game.objects.order_by('game_time').filter(week=week_id)
+    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     game_and_pick_list = []
     for game in games_list:
         side = ''
@@ -83,17 +129,24 @@ def submit(request, week_id):
 
         game_and_pick_list.append((game, side))
 
-    context = { 'game_and_pick_list': game_and_pick_list, 'week_id': week_id}
+    context = { 'game_and_pick_list': game_and_pick_list, 'season_id': season_id, 'week_id': week_id}
     return render(request, 'footballseason/submit.html', context)
 
 def pick_is_after_gametime(gametime, date_submitted):
+    # TODO: This logic should hopefully go away with new season's games
     # Adjust for UTC issue (gametimes were added in the wrong timezone. Games
     # that are supposed to start at 7:25PM have a gametime of 2:25PM)
     adjusted_gametime = gametime + timedelta(hours=5)
     return (date_submitted > adjusted_gametime)
 
-def vote(request, week_id):
-    games_list = Game.objects.order_by('game_time').filter(week=week_id)
+def vote(request, season_id, week_id):
+    season_id = int(season_id)
+    week_id = int(week_id)
+    filter_season_id = season_id
+    if (season_id == 2015):
+        #First season (2015) didn't have season populated, it is stored as 0
+        filter_season_id = 0
+    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     name=request.user.first_name
     date_submitted = timezone.now()
     successful_submissions = 0
@@ -113,7 +166,7 @@ def vote(request, week_id):
         elif (selected_team_id != 0):
             # Error!
             print("Error: Invalid selected_team_id: %d" % selected_team_id)
-            return HttpResponseRedirect(reverse('footballseason:display', args=(week_id,)))
+            return HttpResponseRedirect(reverse('footballseason:display', args=(season_id,week_id,)))
 
         if (selected_team_id != 0):
             # Check for an illegal pick
@@ -144,7 +197,7 @@ def vote(request, week_id):
     # Always return an HttpResponseRedirect after successfully dealing
     # with POST data. This prevents data from being posted twice if a
     # user hits the Back button.
-    return HttpResponseRedirect(reverse('footballseason:display', args=(week_id,)))
+    return HttpResponseRedirect(reverse('footballseason:display', args=(season_id, week_id,)))
 
 def update(request):
     url = "http://www.usatoday.com/sports/nfl/standings/"
@@ -193,10 +246,12 @@ def update(request):
             messages.info(request, infomsg)
         print(infomsg)
 
-    context = { 'current_week': get_week()}
+    context = { 'current_season': get_season(), 'current_week': get_week()}
     return render(request, 'footballseason/index.html', context)
 
 def records(request, season, week):
+    season_id = int(season)
+    week_id = int(week)
     # Special hack for default view (current week of current season)
     if (season == 1337 and week == 1337):
         season = get_season()
@@ -213,8 +268,10 @@ def records(request, season, week):
         return render(request, 'footballseason/records.html', context)
 
     # Otherwise, return the season view
-    # 2015 games didnt have a season, change when games do have a season populated
-    game_season = 0
+    game_season = season
+    if (season == 2015):
+        # 2015 games didnt have a season populated
+        game_season = 0
 
     aggregate_list = [] 
     all_users = User.objects.all()
@@ -234,8 +291,13 @@ def records(request, season, week):
     return render(request, 'footballseason/records.html', context)
 
 def live(request):
+    season_id = get_season()
+    filter_season_id = season_id
+    if (season_id == 2015):
+        #First season (2015) didn't have season populated, it is stored as 0
+        filter_season_id = 0
     week_id = get_week()
-    games_list = Game.objects.order_by('game_time').filter(week=week_id)
+    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     scores = espn_api_v3.get_scores(espn_api_v3.NFL)
     live_list = []
     # sort the scores in the order of our games
@@ -244,6 +306,6 @@ def live(request):
             if (score[0] in game.away_team.team_name and score[2] in game.home_team.team_name):
                 live_list.append((game, score))
         
-    context = { 'live_list': live_list , 'week_id': week_id}
+    context = { 'live_list': live_list , 'season_id': season_id, 'week_id': week_id}
     return render(request, 'footballseason/live.html', context)
 

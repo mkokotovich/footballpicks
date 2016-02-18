@@ -4,7 +4,7 @@
 {% block content %}
 
 <div>
-<h1>Submit picks for week {{ week_id }}</h1>
+    <h1>Submit picks for {{ season_id }}, week {{ week_id }}</h1>
 <br>
 </div>
 
@@ -31,7 +31,7 @@
 
 {% if game_and_pick_list %}
 
-<form action="{% url 'footballseason:vote' week_id %}" method="post">
+<form action="{% url 'footballseason:vote' season_id week_id %}" method="post">
     {% csrf_token %}
     <table id="games">
     {% for entry in game_and_pick_list %}

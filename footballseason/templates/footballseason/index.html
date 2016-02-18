@@ -3,7 +3,7 @@
 {% block content %}
 
 <div>
-<h1> Welcome to Football Picks Week {{current_week}}</h1>
+    <h1> Welcome to Football Picks {{current_season}}, Week {{current_week}}</h1>
 <br>
 </div>
 
@@ -22,7 +22,7 @@
 {% endif %}
 
 {% load get_range %}
-<h2><a href="{% url 'footballseason:display' current_week %}">View</a> or <a href="{% url 'footballseason:submit' current_week %}">submit</a> picks for current week</h2>
+<h2><a href="{% url 'footballseason:display' current_season current_week %}">View</a> or <a href="{% url 'footballseason:submit' current_season current_week %}">submit</a> picks for current week</h2>
 <br>
 <h3>Submit picks for week:</h3>
 {% for i in 17|get_range %}
@@ -33,7 +33,7 @@
             {% if week == current_week %}
                 <span class=currentweek>
             {% endif %}
-            <a href="{% url 'footballseason:submit' week %}">{{ week }} </a> &emsp; 
+            <a href="{% url 'footballseason:submit' current_season week %}">{{ week }} </a> &emsp; 
             {% if week == current_week %}
                 </span>
             {% endif %}
@@ -49,7 +49,7 @@
     {% if week == current_week %}
     <span class=currentweek>
     {% endif %}
-    <a href="{% url 'footballseason:display' week %}">{{ week }} </a> &emsp; 
+    <a href="{% url 'footballseason:display' current_season week %}">{{ week }} </a> &emsp; 
     {% if week == current_week %}
     </span>
     {% endif %}
