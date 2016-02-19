@@ -95,9 +95,6 @@ def display(request, season_id, week_id):
         filter_season_id = 0
     if (week_id == 0):
         week_id = get_week()
-    errormsg="Looking for season {0} and week {1}".format(filter_season_id, week_id)
-    print(errormsg)
-    messages.error(request, errormsg)
     games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     context = { 'games_list': games_list , 'season_id': season_id, 'week_id': week_id}
     return render(request, 'footballseason/display.html', context)
