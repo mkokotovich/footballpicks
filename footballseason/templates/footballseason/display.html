@@ -6,6 +6,16 @@
 {% block content %}
 
 <div>
+<h3>View picks for week:</h3>
+{% for i in 17|get_range %}
+    {% with week=i|add:"1" %}
+    <a href="{% url 'footballseason:display' season_id week %}">{{ week }} </a> &emsp;
+    {% endwith %}
+{% endfor %}
+<br><br>
+</div>
+
+<div>
     <h1>Games for {{ season_id }}, week {{ week_id }}</h1>
 </div>
 
