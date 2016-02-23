@@ -15,9 +15,17 @@
         <table id="top-links">
             <tr>
                 <td class="nav">
-                    <a href="{% url 'footballseason:display_current' season_id %}">View picks</a>
+                    {% if season_id %}
+                    <a href="{% url 'footballseason:display_season' season_id %}">View picks</a>
+                    {% else %}
+                    <a href="{% url 'footballseason:display_current' %}">View picks</a>
+                    {% endif %}
                     &nbsp; &nbsp; 
-                    <a href="{% url 'footballseason:submit_current' season_id %}">Submit picks</a>
+                    {% if season_id %}
+                    <a href="{% url 'footballseason:submit_season' season_id %}">Submit picks</a>
+                    {% else %}
+                    <a href="{% url 'footballseason:submit_current' %}">Submit picks</a>
+                    {% endif %}
                     &nbsp; &nbsp; 
                     <a href="{% url 'footballseason:live' %}">Live scores</a>
                 </td>

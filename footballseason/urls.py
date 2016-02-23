@@ -16,10 +16,10 @@ urlpatterns = [
     url(r'^vote/(?P<season_id>[0-9]+)/(?P<week_id>[0-9]+)/$', views.vote, name='vote'),
 
     # eg: /footballseason/submit/2015
-    url(r'^submit/(?P<season_id>[0-9]+)$', views.submit, {'week_id': 0}, name='submit_current'),
+    url(r'^submit/(?P<season_id>[0-9]+)$', views.submit, {'week_id': 0}, name='submit_season'),
 
     # eg: /footballseason/display/2015
-    url(r'^display/(?P<season_id>[0-9]+)/$', views.display, {'week_id': 0}, name='display_current'),
+    url(r'^display/(?P<season_id>[0-9]+)/$', views.display, {'week_id': 0}, name='display_season'),
 
     # eg: /footballseason/submit/
     url(r'^submit/$', views.submit, {'season_id': 0, 'week_id': 0}, name='submit_current'),
