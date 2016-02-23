@@ -21,6 +21,12 @@ urlpatterns = [
     # eg: /footballseason/display/2015
     url(r'^display/(?P<season_id>[0-9]+)/$', views.display, {'week_id': 0}, name='display_current'),
 
+    # eg: /footballseason/submit/
+    url(r'^submit/$', views.submit, {'season_id': 0, 'week_id': 0}, name='submit_current'),
+
+    # eg: /footballseason/display/
+    url(r'^display/$', views.display, {'season_id': 0, 'week_id': 0}, name='display_current'),
+
     # eg: /footballseason/live/
     url(r'^live/$', views.live, name='live'),
 
