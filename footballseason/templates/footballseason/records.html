@@ -7,9 +7,9 @@
 
 <div>
     {% if week %}
-    <h1>Records for week {{ week }} of the {{ season }} season</h1>
+    <h1>Records for week {{ week }} of the {{ season_id }} season</h1>
     {% else %}
-    <h1>Records for the {{ season }} season</h1>
+    <h1>Records for the {{ season_id }} season</h1>
     {% endif %}
 </div>
 
@@ -66,14 +66,14 @@
 </div>
 
 <div>
-    <h3>View records for season {{season}}, week:</h3>
+    <h3>View records for season {{season_id}}, week:</h3>
     {% for i in 17|get_range %}
         {% with week=i|add:"1" %}
-        <a href="{% url 'footballseason:records_by_week' season week %}">{{ week }} </a> &emsp;
+        <a href="{% url 'footballseason:records_by_week' season_id week %}">{{ week }} </a> &emsp;
         {% endwith %}
     {% endfor %}
     <h3>View records for season:</h3>
-    <a href="{% url 'footballseason:records_by_season' 2015 %}">2015</a> &emsp;
+    <a href="{% url 'footballseason:records_by_season' season_id %}">{{season_id}}</a> &emsp;
 <br><br>
 </div>
 

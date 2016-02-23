@@ -16,6 +16,7 @@ import operator
 from footballseason.espn_api import espn_api_v3
 
 from .models import Game, Team, Pick, Record
+from .forms import SeasonChoice
 
 # the start of "week 1", the tuesday before the first game
 # Not sure of a prettier way to do this
@@ -80,15 +81,33 @@ def update_records(team):
         record.save()
 
 def index(request):
-    context = { 'current_season': get_season(),
-                'current_week': get_week()}
+    season_id = 0
+    if request.method == 'POST':
+        season_choice = SeasonChoice(request.POST)
+        if season_choice.is_valid():
+            season_id = season_choice.cleaned_data['season']
+    if (season_id == 0):
+        season_id = get_season()
+    season_choice = SeasonChoice(initial={'season':season_id})
+    week_id = get_week()
+    if (season_id != get_season()):
+        # If this is a past season, set the week to week 18
+        week_id = 18
+    context = { 'season_id': season_id,
+                'week_id': week_id,
+                'season_choice': season_choice}
     return render(request, 'footballseason/index.html', context)
 
 def display(request, season_id, week_id):
     season_id = int(season_id)
     week_id = int(week_id)
+    if request.method == 'POST':
+        season_choice = SeasonChoice(request.POST)
+        if season_choice.is_valid():
+            season_id = season_choice.cleaned_data['season']
     if (season_id == 0):
         season_id = get_season()
+    season_choice = SeasonChoice(initial={'season':season_id})
     filter_season_id = season_id
     if (season_id == 2015):
         #First season (2015) didn't have season populated, it is stored as 0
@@ -96,15 +115,23 @@ def display(request, season_id, week_id):
     if (week_id == 0):
         week_id = get_week()
     games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
-    context = { 'games_list': games_list , 'season_id': season_id, 'week_id': week_id}
+    context = { 'games_list': games_list ,
+                'season_id': season_id,
+                'week_id': week_id,
+                'season_choice': season_choice}
     return render(request, 'footballseason/display.html', context)
 
 @login_required(login_url='/login/')
 def submit(request, season_id, week_id):
     season_id = int(season_id)
     week_id = int(week_id)
+    if request.method == 'POST':
+        season_choice = SeasonChoice(request.POST)
+        if season_choice.is_valid():
+            season_id = season_choice.cleaned_data['season']
     if (season_id == 0):
         season_id = get_season()
+    season_choice = SeasonChoice(initial={'season':season_id})
     filter_season_id = season_id
     if (season_id == 2015):
         #First season (2015) didn't have season populated, it is stored as 0
@@ -126,7 +153,11 @@ def submit(request, season_id, week_id):
 
         game_and_pick_list.append((game, side))
 
-    context = { 'game_and_pick_list': game_and_pick_list, 'season_id': season_id, 'week_id': week_id}
+    context = { 'game_and_pick_list': game_and_pick_list,
+                'season_id': season_id,
+                'week_id': week_id,
+                'season_choice': season_choice}
+
     return render(request, 'footballseason/submit.html', context)
 
 def pick_is_after_gametime(gametime, date_submitted):
@@ -243,30 +274,40 @@ def update(request):
             messages.info(request, infomsg)
         print(infomsg)
 
-    context = { 'current_season': get_season(), 'current_week': get_week()}
+    context = { 'season_id': get_season(), 'week_id': get_week()}
     return render(request, 'footballseason/index.html', context)
 
-def records(request, season, week):
-    season_id = int(season)
+def records(request, season_id, week):
+    season_id = int(season_id)
     week_id = int(week)
+    if request.method == 'POST':
+        season_choice = SeasonChoice(request.POST)
+        if season_choice.is_valid():
+            season_id = season_choice.cleaned_data['season']
+
     # Special hack for default view (current week of current season)
-    if (season == 1337 and week == 1337):
-        season = get_season()
+    if (season_id == 1337 and week == 1337):
+        season_id = get_season()
         week = get_week()
 
     # If season isn't supplied, use the current season
-    if (season == 0):
-        season = get_season()
+    if (season_id == 0):
+        season_id = get_season()
+
+    season_choice = SeasonChoice(initial={'season':season_id})
 
     #if a week is supplied, give the week view
     if (week != 0):
-        record_list = Record.objects.filter(season=season, week=week).order_by('-wins')
-        context = {'record_list': record_list, 'season': season, 'week': week }
+        record_list = Record.objects.filter(season=season_id, week=week).order_by('-wins')
+        context = {'record_list': record_list,
+                   'season_id': season_id,
+                   'week': week,
+                   'season_choice': season_choice}
         return render(request, 'footballseason/records.html', context)
 
     # Otherwise, return the season view
-    game_season = season
-    if (season == 2015):
+    game_season = season_id
+    if (season_id == 2015):
         # 2015 games didnt have a season populated
         game_season = 0
 
@@ -276,7 +317,7 @@ def records(request, season, week):
     for each_user in all_users:
         if (each_user.username == 'admin'):
             continue
-        win_sum = sum([i.wins for i in Record.objects.filter(season=season, user_name=each_user.first_name)])
+        win_sum = sum([i.wins for i in Record.objects.filter(season=season_id, user_name=each_user.first_name)])
         total_games = Pick.objects.filter(game__season=game_season, game__game_time__lte=current_time, user_name=each_user.first_name).count()
         if (total_games == 0):
             continue
@@ -284,7 +325,9 @@ def records(request, season, week):
         percentage = win_sum / total_games
         aggregate_list.append((each_user.first_name, win_sum, total_games - win_sum, percentage))
     season_totals = sorted(aggregate_list, key=lambda record: record[3], reverse=True)
-    context = {'season_totals': season_totals, 'season': season}
+    context = {'season_totals': season_totals,
+               'season_id': season_id,
+               'season_choice': season_choice}
     return render(request, 'footballseason/records.html', context)
 
 def live(request):

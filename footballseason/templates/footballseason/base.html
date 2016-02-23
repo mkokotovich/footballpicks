@@ -15,11 +15,20 @@
         <table id="top-links">
             <tr>
                 <td class="nav">
-                    <a href="{% url 'footballseason:display_current' %}">View picks</a>
+                    <a href="{% url 'footballseason:display_current' season_id %}">View picks</a>
                     &nbsp; &nbsp; 
-                    <a href="{% url 'footballseason:submit_current' %}">Submit picks</a>
+                    <a href="{% url 'footballseason:submit_current' season_id %}">Submit picks</a>
                     &nbsp; &nbsp; 
                     <a href="{% url 'footballseason:live' %}">Live scores</a>
+                </td>
+                <td class="season">
+                    {% if season_choice %}
+                    <form action="." method="post">
+                        {% csrf_token %}
+                        {{ season_choice.season }}
+                        <input type="submit" value="Change season" />
+                    </form>
+                    {% endif %}
                 </td>
                 <td class="login">
                     {% if user.is_authenticated %}
