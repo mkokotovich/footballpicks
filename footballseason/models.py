@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import timezone
+import pytz
 
 class Team(models.Model):
     team_name = models.CharField(max_length=200)
@@ -26,11 +27,20 @@ class Game(models.Model):
 
     def gametime(self):
         try:
-            # Week two was entered manually and has to be treated differently
-            if (self.week <= 2):
-                gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 
+            # Season 2015 was different
+            if (self.season == 0):
+                #Week two was entered manually and has to be treated differently
+                if (self.week <= 2):
+                    gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 
+                else:
+                    gametimestr = self.game_time.strftime("%b %d, %I:%M %p") 
+            # All other seasons were entered as UTC time
             else:
-                gametimestr = self.game_time.strftime("%b %d, %I:%M %p") 
+                # Defaulting to central for now
+                central_tz = pytz.timezone("America/Chicago")
+                gametime_central = central_tz.normalize(self.game_time.astimezone(central_tz))
+                gametimestr = gametime_central.strftime("%b %d, %I:%M %p") 
+
 
         except NameError:
             gametimestr = ""
