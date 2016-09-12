@@ -17,6 +17,14 @@ def get_last_game_for_team(team):
     last_game = games[0]
     return last_game
 
+def get_season():
+    now = datetime.now()
+    if (now.month > 1):
+        return now.year
+    else:
+        # Jan and Feb should be in the year prior, to stick to seasons
+        return now.year - 1
+
 def update_records(team):
     try:
         last_game = get_last_game_for_team(team)
@@ -26,12 +34,13 @@ def update_records(team):
         print("Error: Unable to find game to update records. Team: {0}".format(team))
         return 0
     
+    current_season = get_season()
     winning_picks = last_game.pick_set.filter(team_to_win=team)
     for pick in winning_picks:
         try:
-            record = Record.objects.get(user_name=pick.user_name, season=2015, week=last_game_week)
+            record = Record.objects.get(user_name=pick.user_name, season=current_season, week=last_game_week)
         except:
-            record = Record(user_name=pick.user_name, season=2015, week=last_game_week, wins=0);
+            record = Record(user_name=pick.user_name, season=current_season, week=last_game_week, wins=0);
         record.wins += 1
         record.save()
 
