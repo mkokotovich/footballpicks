@@ -290,11 +290,16 @@ def records(request, season_id, week):
         season_id = get_season()
         week = get_week()
 
+    # Another special hack for all time view
+    if (season_id == 42 or week == 42):
+        season_id = 42
+        week = 0
+
     # If season isn't supplied, use the current season
     if (season_id == 0):
         season_id = get_season()
 
-    season_choice = SeasonChoice(initial={'season':season_id})
+    season_choice = SeasonChoice(initial={'season':get_season() if season_id == 42 else season_id})
 
     #if a week is supplied, give the week view
     if (week != 0):
@@ -317,8 +322,16 @@ def records(request, season_id, week):
     for each_user in all_users:
         if (each_user.username == 'admin'):
             continue
-        win_sum = sum([i.wins for i in Record.objects.filter(season=season_id, user_name=each_user.first_name)])
-        total_games = Pick.objects.filter(game__season=game_season, game__game_time__lte=current_time, user_name=each_user.first_name).count()
+        # First find the number of wins from the Record table
+        query = Record.objects.filter(user_name=each_user.first_name)
+        if season_id != 42:
+            query = query.filter(season=season_id)
+        win_sum = sum([i.wins for i in query])
+        # Then find the total number of games from the Pick table
+        query = Pick.objects.filter(game__game_time__lte=current_time, user_name=each_user.first_name)
+        if season_id != 42:
+            query = query.filter(game__season=game_season)
+        total_games = query.count()
         if (total_games == 0):
             continue
 
@@ -328,6 +341,9 @@ def records(request, season_id, week):
     context = {'season_totals': season_totals,
                'season_id': season_id,
                'season_choice': season_choice}
+    if (season_id == 42):
+        context['alltime'] = True
+        context['season_id'] = get_season()
     return render(request, 'footballseason/records.html', context)
 
 def live(request):

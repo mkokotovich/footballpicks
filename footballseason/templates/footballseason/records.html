@@ -8,8 +8,10 @@
 <div>
     {% if week %}
     <h1>Records for week {{ week }} of the {{ season_id }} season</h1>
-    {% else %}
+    {% elif not alltime %}
     <h1>Records for the {{ season_id }} season</h1>
+    {% else %}
+    <h1>All Time Records</h1>
     {% endif %}
 </div>
 
@@ -74,6 +76,8 @@
     {% endfor %}
     <h3>View records for season:</h3>
     <a href="{% url 'footballseason:records_by_season' season_id %}">{{season_id}}</a> &emsp;
+    <br><br>
+    <h3><a href="{% url 'footballseason:records_all_time' %}">View all time records</a> </h3>
 <br><br>
 </div>
 

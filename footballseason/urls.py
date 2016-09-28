@@ -43,4 +43,6 @@ urlpatterns = [
     # eg: /footballseason/records/2015/3/
     url(r'^records/(?P<season_id>[0-9]+)/(?P<week>[0-9]+)/$', views.records, name='records_by_week'),
 
+    # eg: /footballseason/records/alltime/
+    url(r'^records/alltime/$', views.records, {'week': 42, 'season_id':42}, name='records_all_time'),
 ]
