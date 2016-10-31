@@ -9,6 +9,7 @@ from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.contrib import messages
 from datetime import datetime, timedelta
+import calendar
 from math import ceil
 from bs4 import BeautifulSoup
 import urllib.request
@@ -18,22 +19,50 @@ from footballseason.espn_api import espn_api_v3
 from .models import Game, Team, Pick, Record
 from .forms import SeasonChoice
 
-# the start of "week 1", the tuesday before the first game
-# Not sure of a prettier way to do this
 def get_week1_start():
     current_season = get_season()
-    if (current_season == 2015):
+    return get_week1_start_for_season(current_season)
+
+# the start of "week 1", the tuesday before the first game
+# Not sure of a prettier way to do this
+def get_week1_start_for_season(season):
+    if (season == 2015):
         week1_start = datetime(2015,9,8,0,0,0)
-    elif (current_season == 2016):
+    elif (season == 2016):
         week1_start = datetime(2016,9,6,0,0,0)
-    elif (current_season == 2017):
+    elif (season == 2017):
         week1_start = datetime(2017,9,5,0,0,0)
-    elif (current_season == 2018):
+    elif (season == 2018):
         week1_start = datetime(2018,9,4,0,0,0)
     else:
         week1_start = datetime(2015,9,8,0,0,0)
-
     return week1_start
+
+def get_gameday_for_season_and_week(season, week):
+    week1_start = get_week1_start_for_season(season)
+    return week1_start + timedelta(days=5) + timedelta(days=(7*(week-1)))
+
+def get_month_for_week(season, week):
+    week_gameday = get_gameday_for_season_and_week(season, week)
+    return week_gameday.month
+
+def get_first_and_last_weeks_for_a_month(season, month):
+    gameday = get_gameday_for_season_and_week(season, 1)
+    first_week = 0
+    last_week = 0
+    num_weeks = 1
+    # Find first week of month
+    while gameday.month != month:
+        gameday += timedelta(days=(7))
+        num_weeks += 1
+    first_week = num_weeks
+    # Find last week of month
+    last_gameday = gameday
+    while gameday.month == month and num_weeks < 18:
+        gameday += timedelta(days=(7))
+        num_weeks += 1
+    last_week = num_weeks - 1
+    return (first_week, last_week)
 
 def get_season():
     now = datetime.now()
@@ -277,40 +306,36 @@ def update(request):
     context = { 'season_id': get_season(), 'week_id': get_week()}
     return render(request, 'footballseason/index.html', context)
 
-def records(request, season_id, week):
+def records(request, season_id=0, week=0, view="week", month=0):
     season_id = int(season_id)
     week_id = int(week)
+    month_id = int(month)
     if request.method == 'POST':
         season_choice = SeasonChoice(request.POST)
         if season_choice.is_valid():
             season_id = season_choice.cleaned_data['season']
 
-    # Special hack for default view (current week of current season)
-    if (season_id == 1337 and week == 1337):
-        season_id = get_season()
-        week = get_week()
-
-    # Another special hack for all time view
-    if (season_id == 42 or week == 42):
-        season_id = 42
-        week = 0
+    # If week isn't supplied, use the current week
+    if (week_id == 0):
+        week_id = get_week()
 
     # If season isn't supplied, use the current season
     if (season_id == 0):
         season_id = get_season()
 
-    season_choice = SeasonChoice(initial={'season':get_season() if season_id == 42 else season_id})
+    # Get the season choice for the context
+    season_choice = SeasonChoice(initial={'season':get_season() if view == "alltime" else season_id})
 
-    #if a week is supplied, give the week view
-    if (week != 0):
-        record_list = Record.objects.filter(season=season_id, week=week).order_by('-wins')
+    # If the view is week, we don't need the extra stats, just return the basic count
+    if view == "week":
+        # Find the wins for the specified week
+        record_list = Record.objects.filter(season=season_id, week=week_id).order_by('-wins')
         context = {'record_list': record_list,
                    'season_id': season_id,
-                   'week': week,
+                   'week': week_id,
                    'season_choice': season_choice}
         return render(request, 'footballseason/records.html', context)
 
-    # Otherwise, return the season view
     game_season = season_id
     if (season_id == 2015):
         # 2015 games didnt have a season populated
@@ -324,26 +349,43 @@ def records(request, season_id, week):
             continue
         # First find the number of wins from the Record table
         query = Record.objects.filter(user_name=each_user.first_name)
-        if season_id != 42:
+        # If we aren't doing an all-time view, filter by the current season
+        if view != "alltime":
             query = query.filter(season=season_id)
+        # If month view, filter by the weeks in that month
+        if view == "month":
+            first_week, last_week = get_first_and_last_weeks_for_a_month(season_id, month_id)
+            query = query.filter(week__gte=first_week, week__lte=last_week)
         win_sum = sum([i.wins for i in query])
         # Then find the total number of games from the Pick table
         query = Pick.objects.filter(game__game_time__lte=current_time, user_name=each_user.first_name)
-        if season_id != 42:
+        # If we aren't doing an all-time view, filter by the current season
+        if view != "alltime":
             query = query.filter(game__season=game_season)
+        # If month view, filter by the weeks in that month
+        if view == "month":
+            query = query.filter(game__game_time__month=month_id)
         total_games = query.count()
         if (total_games == 0):
             continue
 
         percentage = win_sum / total_games
         aggregate_list.append((each_user.first_name, win_sum, total_games - win_sum, percentage))
-    season_totals = sorted(aggregate_list, key=lambda record: record[3], reverse=True)
+    season_totals = []
+    if view == "month":
+        # Sort by wins, not percentages
+        season_totals = sorted(aggregate_list, key=lambda record: record[1], reverse=True)
+    else:
+        # Sort by percentage
+        season_totals = sorted(aggregate_list, key=lambda record: record[3], reverse=True)
     context = {'season_totals': season_totals,
                'season_id': season_id,
-               'season_choice': season_choice}
-    if (season_id == 42):
-        context['alltime'] = True
+               'season_choice': season_choice,
+               'record_view': view}
+    if view != "alltime":
         context['season_id'] = get_season()
+    if view == "month":
+        context['month'] = calendar.month_name[month_id]
     return render(request, 'footballseason/records.html', context)
 
 def live(request):

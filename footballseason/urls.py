@@ -35,14 +35,17 @@ urlpatterns = [
     url(r'^update/$', views.update, name='update'),
 
     # eg: /footballseason/records/
-    url(r'^records/$', views.records, {'week': 1337, 'season_id':1337}, name='records_default'),
+    url(r'^records/$', views.records, {'view':'week'}, name='records_default'),
 
     # eg: /footballseason/records/2015/
-    url(r'^records/(?P<season_id>[0-9]+)/$', views.records, {'week':0}, name='records_by_season'),
+    url(r'^records/(?P<season_id>[0-9]+)/$', views.records, {'week':0, 'view':'season'}, name='records_by_season'),
 
     # eg: /footballseason/records/2015/3/
-    url(r'^records/(?P<season_id>[0-9]+)/(?P<week>[0-9]+)/$', views.records, name='records_by_week'),
+    url(r'^records/(?P<season_id>[0-9]+)/(?P<week>[0-9]+)/$', views.records, {'view':'week'}, name='records_by_week'),
+
+    # eg: /footballseason/records/2015/month/9/
+    url(r'^records/(?P<season_id>[0-9]+)/month/(?P<month>[0-9]+)/$', views.records, {'view':'month'}, name='records_by_month'),
 
     # eg: /footballseason/records/alltime/
-    url(r'^records/alltime/$', views.records, {'week': 42, 'season_id':42}, name='records_all_time'),
+    url(r'^records/alltime/$', views.records, {'view':'alltime'}, name='records_all_time'),
 ]
