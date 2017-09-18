@@ -109,7 +109,7 @@ DATABASES = {
         }
 }
 
-DATABASES['default'] =  dj_database_url.config(default='postgres://postgresusr:postgrespwd@localhost/fbpicks')
+DATABASES['default'] =  dj_database_url.config(default='postgres://postgres:postgres@localhost/fbpicks')
 #Use sqlite3 for test database
 if ('test' in sys.argv):
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}

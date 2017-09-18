@@ -13,7 +13,7 @@ from footballseason.models import Game, Team, Pick, Record
 
 class Command(NoArgsCommand):
 
-    season = 2016
+    season = 2017
     week_list = range(1,18)
 
     espn_team_names = {
@@ -22,8 +22,8 @@ class Command(NoArgsCommand):
         "tb": "Tampa Bay Buccaneers",
         "sea": "Seattle Seahawks",
         "sf": "San Francisco 49ers",
-        "sd": "San Diego Chargers",
-        "la": "Los Angeles Rams",
+        "lac": "Los Angeles Chargers",
+        "lar": "Los Angeles Rams",
         "pit": "Pittsburgh Steelers",
         "phi": "Philadelphia Eagles",
         "oak": "Oakland Raiders",
