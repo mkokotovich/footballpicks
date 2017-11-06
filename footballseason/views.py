@@ -257,9 +257,13 @@ def vote(request, season_id, week_id):
     return HttpResponseRedirect(reverse('footballseason:display', args=(season_id, week_id,)))
 
 def update(request):
-    url = "http://www.usatoday.com/sports/nfl/standings/"
-    with urllib.request.urlopen(url) as response:
-        html = response.read()
+    url = "https://www.usatoday.com/sports/nfl/standings/"
+    req = urllib.request.Request(url)
+    req.add_header('Pragma', 'no-cache')
+    req.add_header('Cache-Control', 'no-cache')
+    response = urllib.request.urlopen(req)
+    html = response.read()
+
     soup = BeautifulSoup(html, 'html.parser')
     failure = 0
     successful_updates = 0
