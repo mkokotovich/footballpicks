@@ -8,6 +8,7 @@ import pytz
 from django.core.management.base import NoArgsCommand
 
 from footballseason.models import Game, Team, Pick, Record
+import espn_common
 
 #Call from CLI via: $ python manage.py generate_schedule
 
@@ -15,41 +16,6 @@ class Command(NoArgsCommand):
 
     season = 2017
     week_list = range(1,18)
-
-    espn_team_names = {
-        "wsh": "Washington Redskins",
-        "ten": "Tennessee Titans",
-        "tb": "Tampa Bay Buccaneers",
-        "sea": "Seattle Seahawks",
-        "sf": "San Francisco 49ers",
-        "lac": "Los Angeles Chargers",
-        "lar": "Los Angeles Rams",
-        "pit": "Pittsburgh Steelers",
-        "phi": "Philadelphia Eagles",
-        "oak": "Oakland Raiders",
-        "nyj": "New York Jets",
-        "nyg": "New York Giants",
-        "no": "New Orleans Saints",
-        "ne": "New England Patriots",
-        "min": "Minnesota Vikings",
-        "mia": "Miami Dolphins",
-        "kc": "Kansas City Chiefs",
-        "jax": "Jacksonville Jaguars",
-        "ind": "Indianapolis Colts",
-        "hou": "Houston Texans",
-        "gb": "Green Bay Packers",
-        "det": "Detroit Lions",
-        "den": "Denver Broncos",
-        "dal": "Dallas Cowboys",
-        "cle": "Cleveland Browns",
-        "cin": "Cincinnati Bengals",
-        "chi": "Chicago Bears",
-        "car": "Carolina Panthers",
-        "buf": "Buffalo Bills",
-        "bal": "Baltimore Ravens",
-        "atl": "Atlanta Falcons",
-        "ari": "Arizona Cardinals"
-    }
 
     def add_games_from_one_week(self, season, week):
         url = "http://espn.go.com/nfl/schedule/_/year/{0}/week/{1}".format(season, week)
@@ -77,7 +43,7 @@ class Command(NoArgsCommand):
                 print(timezone.is_aware(local_gametime))
                 team_names = []
                 for team_abbr in row.find_all('abbr'):
-                    team_names.append(self.espn_team_names[team_abbr.contents[0].lower()])
+                    team_names.append(espn_common.espn_team_names[team_abbr.contents[0].lower()])
                 try:
                     away = Team.objects.get(team_name=team_names[0])
                     home = Team.objects.get(team_name=team_names[1])
