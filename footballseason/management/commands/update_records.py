@@ -1,4 +1,4 @@
-# This may not work, it needs to be tested at the beginning of the season
+# This is not yet implemented
 
 from datetime import datetime
 from django.utils import timezone
@@ -15,8 +15,7 @@ from footballseason import fb_utils
 
 class Command(NoArgsCommand):
 
-    #self.season = fb_utils.get_season()
-    season = 2017
+    season = fb_utils.get_season()
 
     def add_games_from_one_week(self, season, week):
         url = "http://www.espn.com/nfl/standings/_/season/{}/group/league".format(season)

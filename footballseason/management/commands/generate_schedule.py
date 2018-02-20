@@ -8,13 +8,14 @@ import pytz
 from django.core.management.base import NoArgsCommand
 
 from footballseason.models import Game, Team, Pick, Record
+from footballseason import fb_utils
 import espn_common
 
 #Call from CLI via: $ python manage.py generate_schedule
 
 class Command(NoArgsCommand):
 
-    season = 2017
+    season = fb_utils.get_season()
     week_list = range(1,18)
 
     def add_games_from_one_week(self, season, week):
