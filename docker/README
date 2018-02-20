@@ -1,0 +1,5 @@
+After the first docker-compose up, you need to run:
+docker-compose exec db /fbpicks_db/import_db.sh
+to import the production database
+Then run:
+docker-compose restart web

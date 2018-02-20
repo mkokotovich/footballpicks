@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from datetime import datetime, timedelta
 import calendar
-from math import ceil
 from bs4 import BeautifulSoup
 import urllib.request
 import operator
@@ -18,70 +17,8 @@ from footballseason.espn_api import espn_api_v3
 
 from .models import Game, Team, Pick, Record
 from .forms import SeasonChoice
+import footballseason.fb_utils as utils
 
-def get_week1_start():
-    current_season = get_season()
-    return get_week1_start_for_season(current_season)
-
-# the start of "week 1", the tuesday before the first game
-# Not sure of a prettier way to do this
-def get_week1_start_for_season(season):
-    if (season == 2015):
-        week1_start = datetime(2015,9,8,0,0,0)
-    elif (season == 2016):
-        week1_start = datetime(2016,9,6,0,0,0)
-    elif (season == 2017):
-        week1_start = datetime(2017,9,5,0,0,0)
-    elif (season == 2018):
-        week1_start = datetime(2018,9,4,0,0,0)
-    else:
-        week1_start = datetime(2015,9,8,0,0,0)
-    return week1_start
-
-def get_gameday_for_season_and_week(season, week):
-    week1_start = get_week1_start_for_season(season)
-    return week1_start + timedelta(days=5) + timedelta(days=(7*(week-1)))
-
-def get_month_for_week(season, week):
-    week_gameday = get_gameday_for_season_and_week(season, week)
-    return week_gameday.month
-
-def get_first_and_last_weeks_for_a_month(season, month):
-    gameday = get_gameday_for_season_and_week(season, 1)
-    first_week = 0
-    last_week = 0
-    num_weeks = 1
-    # Find first week of month
-    while gameday.month != month:
-        gameday += timedelta(days=(7))
-        num_weeks += 1
-    first_week = num_weeks
-    # Find last week of month
-    last_gameday = gameday
-    while gameday.month == month and num_weeks < 18:
-        gameday += timedelta(days=(7))
-        num_weeks += 1
-    last_week = num_weeks - 1
-    return (first_week, last_week)
-
-def get_season():
-    now = datetime.now()
-    if (now.month > 1):
-        return now.year
-    else:
-        # Jan and Feb should be in the year prior, to stick to seasons
-        return now.year - 1
-
-def get_week():
-    now = datetime.now()
-    week1_start = get_week1_start()
-    if (now < week1_start):
-        return 1
-    tdelta = now - week1_start
-    week = int(ceil((tdelta.total_seconds()/(60*60*24))/7))
-    if (week > 17):
-        week = 17
-    return week
 
 def get_last_game_for_team(team):
     games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('-game_time')
@@ -103,9 +40,9 @@ def update_records(team):
     winning_picks = last_game.pick_set.filter(team_to_win=team)
     for pick in winning_picks:
         try:
-            record = Record.objects.get(user_name=pick.user_name, season=get_season(), week=last_game_week)
+            record = Record.objects.get(user_name=pick.user_name, season=utils.get_season(), week=last_game_week)
         except:
-            record = Record(user_name=pick.user_name, season=get_season(), week=last_game_week, wins=0);
+            record = Record(user_name=pick.user_name, season=utils.get_season(), week=last_game_week, wins=0);
         record.wins += 1
         record.save()
 
@@ -116,10 +53,10 @@ def index(request):
         if season_choice.is_valid():
             season_id = season_choice.cleaned_data['season']
     if (season_id == 0):
-        season_id = get_season()
+        season_id = utils.get_season()
     season_choice = SeasonChoice(initial={'season':season_id})
-    week_id = get_week()
-    if (season_id != get_season()):
+    week_id = utils.get_week()
+    if (season_id != utils.get_season()):
         # If this is a past season, set the week to week 18
         week_id = 18
     context = { 'season_id': season_id,
@@ -135,14 +72,14 @@ def display(request, season_id, week_id):
         if season_choice.is_valid():
             season_id = season_choice.cleaned_data['season']
     if (season_id == 0):
-        season_id = get_season()
+        season_id = utils.get_season()
     season_choice = SeasonChoice(initial={'season':season_id})
     filter_season_id = season_id
     if (season_id == 2015):
         #First season (2015) didn't have season populated, it is stored as 0
         filter_season_id = 0
     if (week_id == 0):
-        week_id = get_week()
+        week_id = utils.get_week()
     games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     context = { 'games_list': games_list ,
                 'season_id': season_id,
@@ -159,14 +96,14 @@ def submit(request, season_id, week_id):
         if season_choice.is_valid():
             season_id = season_choice.cleaned_data['season']
     if (season_id == 0):
-        season_id = get_season()
+        season_id = utils.get_season()
     season_choice = SeasonChoice(initial={'season':season_id})
     filter_season_id = season_id
     if (season_id == 2015):
         #First season (2015) didn't have season populated, it is stored as 0
         filter_season_id = 0
     if (week_id == 0):
-        week_id = get_week()
+        week_id = utils.get_week()
     games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     game_and_pick_list = []
     for game in games_list:
@@ -307,7 +244,7 @@ def update(request):
             messages.info(request, infomsg)
         print(infomsg)
 
-    context = { 'season_id': get_season(), 'week_id': get_week()}
+    context = { 'season_id': utils.get_season(), 'week_id': utils.get_week()}
     return render(request, 'footballseason/index.html', context)
 
 def records(request, season_id=0, week=0, view="week", month=0):
@@ -321,14 +258,14 @@ def records(request, season_id=0, week=0, view="week", month=0):
 
     # If week isn't supplied, use the current week
     if (week_id == 0):
-        week_id = get_week()
+        week_id = utils.get_week()
 
     # If season isn't supplied, use the current season
     if (season_id == 0):
-        season_id = get_season()
+        season_id = utils.get_season()
 
     # Get the season choice for the context
-    season_choice = SeasonChoice(initial={'season':get_season() if view == "alltime" else season_id})
+    season_choice = SeasonChoice(initial={'season':utils.get_season() if view == "alltime" else season_id})
 
     # If the view is week, we don't need the extra stats, just return the basic count
     if view == "week":
@@ -358,7 +295,7 @@ def records(request, season_id=0, week=0, view="week", month=0):
             query = query.filter(season=season_id)
         # If month view, filter by the weeks in that month
         if view == "month":
-            first_week, last_week = get_first_and_last_weeks_for_a_month(season_id, month_id)
+            first_week, last_week = utils.get_first_and_last_weeks_for_a_month(season_id, month_id)
             query = query.filter(week__gte=first_week, week__lte=last_week)
         win_sum = sum([i.wins for i in query])
         # Then find the total number of games from the Pick table
@@ -387,18 +324,18 @@ def records(request, season_id=0, week=0, view="week", month=0):
                'season_choice': season_choice,
                'record_view': view}
     if view != "alltime":
-        context['season_id'] = get_season()
+        context['season_id'] = utils.get_season()
     if view == "month":
         context['month'] = calendar.month_name[month_id]
     return render(request, 'footballseason/records.html', context)
 
 def live(request):
-    season_id = get_season()
+    season_id = utils.get_season()
     filter_season_id = season_id
     if (season_id == 2015):
         #First season (2015) didn't have season populated, it is stored as 0
         filter_season_id = 0
-    week_id = get_week()
+    week_id = utils.get_week()
     games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
     scores = espn_api_v3.get_scores(espn_api_v3.NFL)
     live_list = []

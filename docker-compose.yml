@@ -1,0 +1,20 @@
+version: '3'
+services:
+    web:
+        build: docker/web
+        command: python manage.py runserver 0.0.0.0:8080
+        ports:
+            - "8080:8080"
+        volumes:
+            - .:/usr/src/app
+        depends_on:
+            - db
+        environment:
+            DATABASE_URL: postgres://postgres:postgres@db/fbpicks
+    db:
+        image: postgres:9.6.2-alpine
+        volumes:
+            - ./docker/db/:/fbpicks_db
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_DB: fbpicks
