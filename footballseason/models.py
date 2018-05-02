@@ -21,8 +21,8 @@ class Team(models.Model):
 class Game(models.Model):
     season = models.IntegerField(default=0)
     week = models.IntegerField(default=0)
-    home_team = models.ForeignKey(Team, related_name='game_home_team')
-    away_team = models.ForeignKey(Team, related_name='game_away_team')
+    home_team = models.ForeignKey(Team, related_name='game_home_team', on_delete=models.PROTECT)
+    away_team = models.ForeignKey(Team, related_name='game_away_team', on_delete=models.PROTECT)
     game_time = models.DateTimeField('Game time')
 
     def gametime(self):
@@ -51,8 +51,8 @@ class Game(models.Model):
 
 class Pick(models.Model):
     user_name = models.CharField(max_length=200)
-    game = models.ForeignKey(Game)
-    team_to_win = models.ForeignKey(Team)
+    game = models.ForeignKey(Game, on_delete=models.PROTECT)
+    team_to_win = models.ForeignKey(Team, on_delete=models.PROTECT)
     date_submitted = models.DateTimeField('Date pick was submitted')
 
     def __str__(self):

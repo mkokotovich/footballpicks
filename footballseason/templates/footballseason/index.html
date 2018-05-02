@@ -22,7 +22,7 @@
 {% endif %}
 
 {% load get_range %}
-<h2><a href="{% url 'footballseason:display' season_id week_id %}">View</a> or <a href="{% url 'footballseason:submit' season_id week_id %}">submit</a> picks for current week</h2>
+<h2><a href="{% url 'display' season_id week_id %}">View</a> or <a href="{% url 'submit' season_id week_id %}">submit</a> picks for current week</h2>
 <br>
 <h3>Submit picks for week:</h3>
 {% for i in 17|get_range %}
@@ -33,7 +33,7 @@
             {% if week == week_id %}
                 <span class=currentweek>
             {% endif %}
-            <a href="{% url 'footballseason:submit' season_id week %}">{{ week }} </a> &emsp; 
+            <a href="{% url 'submit' season_id week %}">{{ week }} </a> &emsp; 
             {% if week == week_id %}
                 </span>
             {% endif %}
@@ -49,7 +49,7 @@
     {% if week == week_id %}
     <span class=currentweek>
     {% endif %}
-    <a href="{% url 'footballseason:display' season_id week %}">{{ week }} </a> &emsp; 
+    <a href="{% url 'display' season_id week %}">{{ week }} </a> &emsp; 
     {% if week == week_id %}
     </span>
     {% endif %}

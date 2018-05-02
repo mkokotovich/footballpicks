@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('user_name', models.CharField(max_length=200)),
                 ('date_submitted', models.DateTimeField(verbose_name='Date pick was submitted')),
-                ('game', models.ForeignKey(to='footballseason.Game')),
+                ('game', models.ForeignKey(to='footballseason.Game', on_delete=models.PROTECT)),
             ],
         ),
         migrations.CreateModel(
@@ -37,16 +37,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pick',
             name='team_to_win',
-            field=models.ForeignKey(to='footballseason.Team'),
+            field=models.ForeignKey(to='footballseason.Team', on_delete=models.PROTECT),
         ),
         migrations.AddField(
             model_name='game',
             name='away_team',
-            field=models.ForeignKey(related_name='game_away_team', to='footballseason.Team'),
+            field=models.ForeignKey(related_name='game_away_team', to='footballseason.Team', on_delete=models.PROTECT),
         ),
         migrations.AddField(
             model_name='game',
             name='home_team',
-            field=models.ForeignKey(related_name='game_home_team', to='footballseason.Team'),
+            field=models.ForeignKey(related_name='game_home_team', to='footballseason.Team', on_delete=models.PROTECT),
         ),
     ]

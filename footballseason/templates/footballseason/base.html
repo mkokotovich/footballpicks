@@ -16,18 +16,18 @@
             <tr>
                 <td class="nav">
                     {% if season_id %}
-                    <a href="{% url 'footballseason:display_season' season_id %}">View picks</a>
+                    <a href="{% url 'display_season' season_id %}">View picks</a>
                     {% else %}
-                    <a href="{% url 'footballseason:display_current' %}">View picks</a>
+                    <a href="{% url 'display_current' %}">View picks</a>
                     {% endif %}
                     &nbsp; &nbsp; 
                     {% if season_id %}
-                    <a href="{% url 'footballseason:submit_season' season_id %}">Submit picks</a>
+                    <a href="{% url 'submit_season' season_id %}">Submit picks</a>
                     {% else %}
-                    <a href="{% url 'footballseason:submit_current' %}">Submit picks</a>
+                    <a href="{% url 'submit_current' %}">Submit picks</a>
                     {% endif %}
                     &nbsp; &nbsp; 
-                    <a href="{% url 'footballseason:live' %}">Live scores</a>
+                    <a href="{% url 'live' %}">Live scores</a>
                 </td>
                 <td class="season">
                     {% if season_choice %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -160,7 +160,7 @@ def vote(request, season_id, week_id):
         elif (selected_team_id != 0):
             # Error!
             print("Error: Invalid selected_team_id: %d" % selected_team_id)
-            return HttpResponseRedirect(reverse('footballseason:display', args=(season_id,week_id,)))
+            return HttpResponseRedirect(reverse('display', args=(season_id,week_id,)))
 
         if (selected_team_id != 0):
             # Check for an illegal pick
@@ -191,7 +191,7 @@ def vote(request, season_id, week_id):
     # Always return an HttpResponseRedirect after successfully dealing
     # with POST data. This prevents data from being posted twice if a
     # user hits the Back button.
-    return HttpResponseRedirect(reverse('footballseason:display', args=(season_id, week_id,)))
+    return HttpResponseRedirect(reverse('display', args=(season_id, week_id,)))
 
 def update(request):
     url = "https://www.usatoday.com/sports/nfl/standings/"

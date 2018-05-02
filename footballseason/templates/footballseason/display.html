@@ -9,7 +9,7 @@
 <h3>View picks for week:</h3>
 {% for i in 17|get_range %}
     {% with week=i|add:"1" %}
-    <a href="{% url 'footballseason:display' season_id week %}">{{ week }} </a> &emsp;
+    <a href="{% url 'display' season_id week %}">{{ week }} </a> &emsp;
     {% endwith %}
 {% endfor %}
 <br><br>
@@ -89,7 +89,7 @@
 <h3>View picks for week:</h3>
 {% for i in 17|get_range %}
     {% with week=i|add:"1" %}
-    <a href="{% url 'footballseason:display' season_id week %}">{{ week }} </a> &emsp;
+    <a href="{% url 'display' season_id week %}">{{ week }} </a> &emsp;
     {% endwith %}
 {% endfor %}
 <br><br>

@@ -73,19 +73,19 @@
     <h3>View records for season {{season_id}}, week:</h3>
     {% for i in 17|get_range %}
         {% with week=i|add:"1" %}
-        <a href="{% url 'footballseason:records_by_week' season_id week %}">{{ week }} </a> &emsp;
+        <a href="{% url 'records_by_week' season_id week %}">{{ week }} </a> &emsp;
         {% endwith %}
     {% endfor %}
     <h3>View records for season {{season_id}}, month:</h3>
-    <a href="{% url 'footballseason:records_by_month' season_id 9 %}">Sept </a> &emsp;
-    <a href="{% url 'footballseason:records_by_month' season_id 10 %}">Oct </a> &emsp;
-    <a href="{% url 'footballseason:records_by_month' season_id 11 %}">Nov </a> &emsp;
-    <a href="{% url 'footballseason:records_by_month' season_id 12 %}">Dec </a> &emsp;
-    <a href="{% url 'footballseason:records_by_month' season_id 1 %}">Jan </a> &emsp;
+    <a href="{% url 'records_by_month' season_id 9 %}">Sept </a> &emsp;
+    <a href="{% url 'records_by_month' season_id 10 %}">Oct </a> &emsp;
+    <a href="{% url 'records_by_month' season_id 11 %}">Nov </a> &emsp;
+    <a href="{% url 'records_by_month' season_id 12 %}">Dec </a> &emsp;
+    <a href="{% url 'records_by_month' season_id 1 %}">Jan </a> &emsp;
     <h3>View records for season:</h3>
-    <a href="{% url 'footballseason:records_by_season' season_id %}">{{season_id}}</a> &emsp;
+    <a href="{% url 'records_by_season' season_id %}">{{season_id}}</a> &emsp;
     <br><br>
-    <h3><a href="{% url 'footballseason:records_all_time' %}">View all time records</a> </h3>
+    <h3><a href="{% url 'records_all_time' %}">View all time records</a> </h3>
 <br><br>
 </div>
 
