@@ -57,14 +57,16 @@ class Command(NoArgsCommand):
                 print("Adding: {0}".format(newgame))
                 newgame.save()
 
-    def add_all_games(self):
-        for week in range(1,18):
-            print("Processing week {0}".format(week))
-            self.add_games_from_one_week(self.season, week)
+    def update_records_for_current_week(self):
+        season = fb_utils.get_season()
+        week = fb_utils.get_week()
+        print("Updating records for season {} week {}".format(season, week))
+        self.update_records_for_week(season, week)
 
     def handle_noargs(self, **options):
-        self.add_all_games()
+        self.update_records_for_current_week()
 
 
     if __name__ == "__main__":
-        main()
+        cmd = Command()
+        cmd.update_records_for_current_week()
