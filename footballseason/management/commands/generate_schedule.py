@@ -1,19 +1,22 @@
 # From: http://espn.go.com/nfl/schedule
 
+import sys
 from datetime import datetime
 from django.utils import timezone
 from bs4 import BeautifulSoup
 import urllib.request
 import pytz
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
 
 from footballseason.models import Game, Team, Pick, Record
 from footballseason import fb_utils
-import espn_common
+import footballseason.management.commands.espn_common as espn_common
+
 
 #Call from CLI via: $ python manage.py generate_schedule
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
     season = fb_utils.get_season()
     week_list = range(1,18)
@@ -51,17 +54,25 @@ class Command(NoArgsCommand):
                 except ObjectDoesNotExist:
                     # Could not find team, this shouldn't happen
                     print("Count not find either team {0} or {1}, unable to add game to schedule".format(team_names[0], team_names[1]))
-                    continue
-                newgame = Game(season=season, week=week, home_team=home, away_team=away, game_time=game_tzaware)
-                print("Adding: {0}".format(newgame))
-                newgame.save()
+                    sys.exit(1)
+                try:
+                    obj = Game.objects.get(season=season, week=week, home_team=home, away_team=away)
+                except Game.DoesNotExist:
+                    obj = Game(season=season, week=week, home_team=home, away_team=away, game_time = game_tzaware)
+                    print("Adding: {0}".format(obj))
+                else:
+                    obj.game_time = game_tzaware
+                    print(f"{obj} was already on the schedule, updating gametime and saving")
+                finally:
+                    obj.save()
+
 
     def add_all_games(self):
         for week in self.week_list:
             print("Processing week {0}".format(week))
             self.add_games_from_one_week(self.season, week)
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         self.add_all_games()
 
 

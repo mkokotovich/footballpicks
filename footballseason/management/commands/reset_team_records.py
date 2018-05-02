@@ -1,10 +1,10 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from footballseason.models import Game, Team, Pick, Record
 
 #Call from CLI via: $ python manage.py reset_team_records
 
-class Command(NoArgsCommand):
-    def handle_noargs(self, **options):
+class Command(BaseCommand):
+    def handle(self, *args, **options):
         self.reset_all_team_records()
 
     def reset_all_team_records(self):

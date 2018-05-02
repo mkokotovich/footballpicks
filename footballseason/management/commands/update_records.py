@@ -5,7 +5,7 @@ from django.utils import timezone
 from bs4 import BeautifulSoup
 import urllib.request
 import pytz
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from footballseason.models import Game, Team, Pick, Record
 from footballseason.management.commands import espn_common
@@ -13,7 +13,7 @@ from footballseason import fb_utils
 
 #Call from CLI via: $ python manage.py update_records
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
     season = fb_utils.get_season()
 
@@ -63,7 +63,7 @@ class Command(NoArgsCommand):
         print("Updating records for season {} week {}".format(season, week))
         self.update_records_for_week(season, week)
 
-    def handle_noargs(self, **options):
+    def handle(self, *args, **options):
         self.update_records_for_current_week()
 
 
