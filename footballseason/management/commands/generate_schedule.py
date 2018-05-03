@@ -1,5 +1,6 @@
 # From: http://espn.go.com/nfl/schedule
 
+import logging
 import sys
 from datetime import datetime
 from django.utils import timezone
@@ -14,6 +15,8 @@ from footballseason import fb_utils
 import footballseason.management.commands.espn_common as espn_common
 
 
+LOG = logging.getLogger(__name__)
+
 #Call from CLI via: $ python manage.py generate_schedule
 
 class Command(BaseCommand):
@@ -23,7 +26,7 @@ class Command(BaseCommand):
 
     def add_games_from_one_week(self, season, week):
         url = "http://espn.go.com/nfl/schedule/_/year/{0}/week/{1}".format(season, week)
-        print("url: {0}".format(url))
+        LOG.info("url: {0}".format(url))
         with urllib.request.urlopen(url) as response:
             html = response.read()
         soup = BeautifulSoup(html, 'html.parser')
@@ -44,7 +47,7 @@ class Command(BaseCommand):
                 game_tzaware = pytz.utc.localize(game_datetime)
                 current_tz = timezone.get_current_timezone()
                 local_gametime = current_tz.normalize(game_tzaware.astimezone(current_tz))
-                print(timezone.is_aware(local_gametime))
+                LOG.info(timezone.is_aware(local_gametime))
                 team_names = []
                 for team_abbr in row.find_all('abbr'):
                     team_names.append(espn_common.espn_team_names[team_abbr.contents[0].lower()])
@@ -53,23 +56,23 @@ class Command(BaseCommand):
                     home = Team.objects.get(team_name=team_names[1])
                 except ObjectDoesNotExist:
                     # Could not find team, this shouldn't happen
-                    print("Count not find either team {0} or {1}, unable to add game to schedule".format(team_names[0], team_names[1]))
+                    LOG.info("Count not find either team {0} or {1}, unable to add game to schedule".format(team_names[0], team_names[1]))
                     sys.exit(1)
                 try:
                     obj = Game.objects.get(season=season, week=week, home_team=home, away_team=away)
                 except Game.DoesNotExist:
                     obj = Game(season=season, week=week, home_team=home, away_team=away, game_time = game_tzaware)
-                    print("Adding: {0}".format(obj))
+                    LOG.info("Adding: {0}".format(obj))
                 else:
                     obj.game_time = game_tzaware
-                    print(f"{obj} was already on the schedule, updating gametime and saving")
+                    LOG.info(f"{obj} was already on the schedule, updating gametime and saving")
                 finally:
                     obj.save()
 
 
     def add_all_games(self):
         for week in self.week_list:
-            print("Processing week {0}".format(week))
+            LOG.info("Processing week {0}".format(week))
             self.add_games_from_one_week(self.season, week)
 
     def handle(self, *args, **options):

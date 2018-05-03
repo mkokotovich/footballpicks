@@ -1,4 +1,5 @@
 # This is not yet implemented
+import logging
 
 from datetime import datetime
 from django.utils import timezone
@@ -6,67 +7,98 @@ from bs4 import BeautifulSoup
 import urllib.request
 import pytz
 from django.core.management.base import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 from footballseason.models import Game, Team, Pick, Record
-from footballseason.management.commands import espn_common
+from footballseason.management.commands import cbs_common
 from footballseason import fb_utils
+
+
+LOG = logging.getLogger(__name__)
 
 #Call from CLI via: $ python manage.py update_records
 
 class Command(BaseCommand):
 
-    season = fb_utils.get_season()
 
-    def add_games_from_one_week(self, season, week):
-        url = "http://www.espn.com/nfl/standings/_/season/{}/group/league".format(season)
-        print("url: {0}".format(url))
+    def get_last_game_for_team(self, team):
+        games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('-game_time')
+        if (len(games) == 0):
+            LOG.error(f"Error: unable to find last game for team {team}")
+            return None
+        last_game = games[0]
+        return last_game
+
+
+    def update_user_records(self, team):
+        try:
+            last_game = self.get_last_game_for_team(team)
+            last_game_week = last_game.week
+        except Exception as ex:
+            LOG.error(f"Error: Unable to find game to update records. Team: {team}, {ex}")
+            return
+
+        LOG.info(f"Updating winners for {last_game}")
+        winning_picks = last_game.pick_set.filter(team_to_win=team)
+        for pick in winning_picks:
+            try:
+                record = Record.objects.get(user_name=pick.user_name, season=fb_utils.get_season(), week=last_game_week)
+            except:
+                record = Record(user_name=pick.user_name, season=fb_utils.get_season(), week=last_game_week, wins=0);
+            record.wins += 1
+            LOG.info(f"Adding a win to {pick.user_name} for picking {team}")
+            record.save()
+
+
+    def update_records(self):
+        url = "https://www.cbssports.com/nfl/standings"
 
         with urllib.request.urlopen(url) as response:
             html = response.read()
         soup = BeautifulSoup(html, 'html.parser')
 
-        # Each table is a day (e.g. Thursday, Sunday, Monday)
-        for table in soup.findAll("table", class_="schedule"):
-            odd=table.find_all('tr', {"class": "odd"})
-            even=table.find_all('tr', {"class": "even"})
-            all_results = odd+even
-            for row in all_results:
-                # Each row is one game
-                game_time_data = row.find('td', { "data-behavior":"date_time" } )
-                if game_time_data == None:
-                    # bye teams
-                    continue
-                game_time = game_time_data['data-date']
-                #  2016-12-16T01:25Z
-                game_datetime = datetime.strptime(game_time, "%Y-%m-%dT%H:%MZ")
-                game_tzaware = pytz.utc.localize(game_datetime)
-                current_tz = timezone.get_current_timezone()
-                local_gametime = current_tz.normalize(game_tzaware.astimezone(current_tz))
-                print(timezone.is_aware(local_gametime))
-                team_names = []
-                for team_abbr in row.find_all('abbr'):
-                    team_names.append(espn_common.espn_team_names[team_abbr.contents[0].lower()])
-                try:
-                    away = Team.objects.get(team_name=team_names[0])
-                    home = Team.objects.get(team_name=team_names[1])
-                except ObjectDoesNotExist:
-                    # Could not find team, this shouldn't happen
-                    print("Count not find either team {0} or {1}, unable to add game to schedule".format(team_names[0], team_names[1]))
-                    continue
-                newgame = Game(season=season, week=week, home_team=home, away_team=away, game_time=game_tzaware)
-                print("Adding: {0}".format(newgame))
-                newgame.save()
+        row1=soup.find_all('tr', {"class": "row1"})
+        row2=soup.find_all('tr', {"class": "row2"})
+        all_results = row1+row2
+        successful_updates = 0
+        for row in all_results:
+            #import pdb
+            #pdb.set_trace()
+            # Each row is one team's record
+            entries=row.find_all('td')
+            # it goes name, W, L, T
+            cbs_team_name = entries[0].a.text
+            team_name = cbs_common.cbs_team_names[cbs_team_name]
+            wins = int(entries[1].text)
+            loses = int(entries[2].text)
+            ties = int(entries[3].text)
 
-    def update_records_for_current_week(self):
-        season = fb_utils.get_season()
-        week = fb_utils.get_week()
-        print("Updating records for season {} week {}".format(season, week))
-        self.update_records_for_week(season, week)
+            try:
+                team = Team.objects.get(team_name=team_name)
+                # An existing team was found, update standings
+                if (team.wins != wins or team.loses != loses or team.ties != ties):
+                    LOG.info(f"{team_name} needs updating")
+                    successful_updates += 1
+
+                if (team.wins < wins):
+                    # This team won, update records. Assuming we update at least once a week
+                    self.update_user_records(team)
+
+                team.wins=wins
+                team.loses=loses
+                team.ties=ties
+                team.save()
+            except ObjectDoesNotExist:
+                # Could not find team, this shouldn't happen
+                LOG.error(f"Could not find team {team_name}, could not update standings")
+        LOG.info(f"Successfully updated {successful_updates} teams")
+
 
     def handle(self, *args, **options):
-        self.update_records_for_current_week()
+        self.update_records()
 
 
     if __name__ == "__main__":
         cmd = Command()
-        cmd.update_records_for_current_week()
+        cmd.update_records()
