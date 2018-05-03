@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -20,10 +21,13 @@ from .forms import SeasonChoice
 import footballseason.fb_utils as utils
 
 
+LOG = logging.getLogger(__name__)
+
+
 def get_last_game_for_team(team):
     games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('-game_time')
     if (len(games) == 0):
-        print("Error: unable to find last game for team {0}".format(team))
+        LOG.error("Error: unable to find last game for team {0}".format(team))
         return None
     last_game = games[0]
     return last_game
@@ -34,7 +38,7 @@ def update_records(team):
         last_game_week = last_game.week
     except:
         # Error
-        print("Error: Unable to find game to update records. Team: {0}".format(team))
+        LOG.error("Error: Unable to find game to update records. Team: {0}".format(team))
         return 0
 
     winning_picks = last_game.pick_set.filter(team_to_win=team)
@@ -159,14 +163,14 @@ def vote(request, season_id, week_id):
             team_selected = game.home_team
         elif (selected_team_id != 0):
             # Error!
-            print("Error: Invalid selected_team_id: %d" % selected_team_id)
+            LOG.error("Error: Invalid selected_team_id: %d" % selected_team_id)
             return HttpResponseRedirect(reverse('display', args=(season_id,week_id,)))
 
         if (selected_team_id != 0):
             # Check for an illegal pick
             if (pick_is_after_gametime(game.game_time, date_submitted)):
                 errormsg="Unable to submit pick for ({0}), game already started.".format(game)
-                print(errormsg)
+                LOG.error(errormsg)
                 messages.error(request, errormsg)
                 continue
 
@@ -185,7 +189,7 @@ def vote(request, season_id, week_id):
 
     if (successful_submissions > 0):
         infomsg = "Successfully submitted {0} picks for {1}".format(successful_submissions, request.user.first_name)
-        print(infomsg)
+        LOG.info(infomsg)
         messages.success(request, infomsg)
 
     # Always return an HttpResponseRedirect after successfully dealing
@@ -231,7 +235,7 @@ def update(request):
             except ObjectDoesNotExist:
                 # Could not find team, this shouldn't happen
                 errormsg = "Could not find team {0}, could not update standings".format(teamname)
-                print(errormsg)
+                LOG.error(errormsg)
                 messages.error(request, errormsg)
                 failure=1
 
@@ -242,7 +246,7 @@ def update(request):
         else:
             infomsg = "No updates available"
             messages.info(request, infomsg)
-        print(infomsg)
+        LOG.info(infomsg)
 
     context = { 'season_id': utils.get_season(), 'week_id': utils.get_week()}
     return render(request, 'footballseason/index.html', context)
