@@ -13,14 +13,20 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
+from django.conf.urls import url
+from django.urls import include
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 urlpatterns = [
     url(r'^footballseason/', include('footballseason.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^login/$', auth_views.login, name="login"),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name="logout"),
+    url(r'^api/v1/', include('api.v1_urls')),
     url(r'^', include('footballseason.urls')),
 ]
