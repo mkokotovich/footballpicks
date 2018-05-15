@@ -9,24 +9,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username')
 
 
-class GameSerializer(serializers.ModelSerializer):
-    home_team = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='team_name'
-     )
-    away_team = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='team_name'
-     )
-
-    class Meta:
-        model = Game
-        fields = '__all__'
-
-
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
+        fields = '__all__'
+
+
+class GameSerializer(serializers.ModelSerializer):
+    home_team = TeamSerializer(read_only=True)
+    away_team = TeamSerializer(read_only=True)
+
+    class Meta:
+        model = Game
         fields = '__all__'
 
 
