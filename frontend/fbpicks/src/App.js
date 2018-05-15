@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from 'antd';
 
 import GameList from './GameList'
+import SignIn from './SignIn'
 
 const App = () => {
   return (
     <div className="App">
-      <Button type="primary">Button</Button>
+      <SignIn/>
       <GameList season='2016' week='2'/>
     </div>
   );
