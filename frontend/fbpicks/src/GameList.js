@@ -5,6 +5,12 @@ import './GameList.css';
 
 import Game from './Game';
 
+function GameListWeekMessage(props) {
+  return (
+    <h2>Week {props.week}, {props.season} Matchups</h2>
+  );
+}
+
 class GameList extends Component {
   constructor(props) {
     super(props);
@@ -16,6 +22,7 @@ class GameList extends Component {
   render() {
     return (
       <div className="GameList">
+        {GameListWeekMessage(this.props)}
         {this.state.games.map((game, i) => <Game game={game} key={i} />)}
       </div>
     );

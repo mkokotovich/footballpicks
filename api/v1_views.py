@@ -12,7 +12,7 @@ class GameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     pagination_class = APIPagination
     filter_fields = ('home_team', 'away_team', 'season', 'week')
-    ordering = "-game_time"
+    ordering = "game_time"
     permission_classes = (IsAdminUserOrReadOnly,)
 
 

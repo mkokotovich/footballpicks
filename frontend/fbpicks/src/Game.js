@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
+import { Row, Col } from 'antd';
+
+import Team from './Team';
+import GameTime from './GameTime';
 
 class Game extends Component {
 
   render() {
     return (
       <div className="Game">
-        Week {this.props.game.week}: {this.props.game.away_team.team_name} at {this.props.game.home_team.team_name}
+        <Row type="flex" justify="center" align="top">
+          <Col span={8}> <Team team={this.props.game.away_team} /> </Col>
+          <Col span={4}> <GameTime game={this.props.game} /> </Col>
+          <Col span={8}> <Team team={this.props.game.home_team} /> </Col>
+        </Row>
       </div>
     );
   }
