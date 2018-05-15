@@ -1,5 +1,7 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_jwt.views import obtain_jwt_token
+
 from api import v1_views
 
 # Create a router and register our viewsets with it.
@@ -11,5 +13,6 @@ router.register(r'records', v1_views.RecordViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    url(r'^', include(router.urls))
+    url(r'^auth/', obtain_jwt_token),
+    url(r'^', include(router.urls)),
 ]

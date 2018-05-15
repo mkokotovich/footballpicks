@@ -1,7 +1,9 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Modal, Button } from 'antd';
+import axios from 'axios';
 
 import SignInForm from './SignInForm'
+
 
 function SignOut(props) {
   return (
@@ -23,12 +25,59 @@ class SignIn extends React.Component {
     };
   }
 
-  handleSignIn(username, password) {
-    console.log("Signed in: " + username);
+  componentDidMount() {
+    // Check if token exists and isn't expired
+    const token = localStorage.getItem('id_token');
+    if (token) {
+      this.signInWithToken(token);
+    }
+  }
+
+  signInWithToken(token) {
+    localStorage.setItem('id_token', token);
+    axios.defaults.headers.common['Authorization'] = token;
     this.setState({isSignedIn: true});
   }
 
+  handleSignIn(username, password) {
+    console.log("Trying to sign in " + username);
+    axios.post('/api/v1/auth/', {
+      username: username,
+      password: password
+    })
+    .then((response) => {
+      const token = response.data.token;
+      const user = response.data.user;
+      if (token) {
+	console.log("Signed in " + username);
+	this.signInWithToken(token);
+	if (user) {
+	  localStorage.setItem('user', JSON.stringify(user));
+	}
+      } else {
+	console.log("Failed to sign in " + username);
+	Modal.error({
+	  title: "Unable to sign in",
+	  content: "Please check username and password and try again",
+	  maskClosable: true,
+	})
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      Modal.error({
+	title: "Unable to sign in",
+	content: "Please check username and password and try again",
+	maskClosable: true,
+      })
+    });
+  }
+
   handleSignOut() {
+    localStorage.removeItem("id_token");
+    localStorage.removeItem("user");
+    delete axios.defaults.headers.common["Authorization"];
+
     console.log("Signed out");
     this.setState({isSignedIn: false});
   }
