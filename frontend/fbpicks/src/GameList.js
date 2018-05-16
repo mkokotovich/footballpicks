@@ -23,7 +23,9 @@ class GameList extends Component {
     return (
       <div className="GameList">
         {GameListWeekMessage(this.props)}
-        {this.state.games.map((game, i) => <Game game={game} key={i} display_picks={this.props.display_picks}/>)}
+        {this.state.games.map((game, i) => <Game game={game}
+                                                 key={i}
+                                                 display_picks={this.props.display_picks} />)}
       </div>
     );
   }

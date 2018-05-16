@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import { Row, Col } from 'antd';
+import React from 'react';
 
-class Pick extends Component {
+import './Pick.css';
 
-  render() {
-    return (
-      <div className="Pick">
-        {this.props.pick.user_name}
-      </div>
-    );
-  }
+function Pick(props) {
+  return (
+    <span className="Pick">
+      {props.pick.user_name} &nbsp;
+    </span>
+  );
 }
 
 export default Pick;
