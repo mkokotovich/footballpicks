@@ -1,5 +1,9 @@
-.TeamRecord {
-}
 .TeamName {
   font-size: 1.875em;
+  margin-right: 5px;
+}
+.TeamRecord {
+  white-space: nowrap;
+}
+.Team {
 }

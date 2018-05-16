@@ -1,4 +1,5 @@
 import React from 'react';
+import { Row, Col } from 'antd';
 
 import './Team.css';
 
@@ -7,12 +8,18 @@ function Team(props) {
   const recordString = "(" + props.team.wins + "-" + props.team.loses + tieString + ")";
   return (
     <div className="Team">
-      <div className="TeamName">
-        {props.team.team_name}
-      </div>
-      <div className="TeamRecord">
-        {recordString}
-      </div>
+      <Row type="flex" justify="center" align="middle">
+        <Col xs="24" sm="12">
+          <span className="TeamName">
+            {props.team.team_name} 
+          </span> 
+        </Col>
+        <Col xs="24" sm="12">
+          <span className="TeamRecord">
+            {recordString}
+          </span>
+        </Col>
+      </Row>
     </div>
   );
 }
