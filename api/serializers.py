@@ -15,18 +15,25 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GameSerializer(serializers.ModelSerializer):
-    home_team = TeamSerializer(read_only=True)
-    away_team = TeamSerializer(read_only=True)
-
-    class Meta:
-        model = Game
-        fields = '__all__'
-
-
 class PickSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pick
+        fields = '__all__'
+
+
+class PickDisplaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pick
+        fields = ('user_name', 'team_to_win')
+
+
+class GameSerializer(serializers.ModelSerializer):
+    home_team = TeamSerializer(read_only=True)
+    away_team = TeamSerializer(read_only=True)
+    picks = PickDisplaySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Game
         fields = '__all__'
 
 

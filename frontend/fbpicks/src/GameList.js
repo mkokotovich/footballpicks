@@ -23,7 +23,7 @@ class GameList extends Component {
     return (
       <div className="GameList">
         {GameListWeekMessage(this.props)}
-        {this.state.games.map((game, i) => <Game game={game} key={i} />)}
+        {this.state.games.map((game, i) => <Game game={game} key={i} display_picks={this.props.display_picks}/>)}
       </div>
     );
   }
@@ -46,6 +46,7 @@ class GameList extends Component {
 }
 
 GameList.defaultProps = {
+    display_picks: true,
     season: '2016',
     week: '1'
   };

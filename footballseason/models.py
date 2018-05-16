@@ -51,7 +51,7 @@ class Game(models.Model):
 
 class Pick(models.Model):
     user_name = models.CharField(max_length=200)
-    game = models.ForeignKey(Game, on_delete=models.PROTECT)
+    game = models.ForeignKey(Game, related_name='picks', on_delete=models.PROTECT)
     team_to_win = models.ForeignKey(Team, on_delete=models.PROTECT)
     date_submitted = models.DateTimeField('Date pick was submitted')
 
