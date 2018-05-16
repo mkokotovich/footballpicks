@@ -9,7 +9,6 @@ function GameTime(props) {
 
   return (
     <div className="GameTime">
-      <br/>
       at
       <br/>
       {month} {date.getDate()}, {date.toLocaleTimeString()}
