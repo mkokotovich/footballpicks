@@ -1,5 +1,8 @@
 import React from 'react';
 import { Form, Icon, Input, Button } from 'antd';
+
+import './SignInForm.css';
+
 const FormItem = Form.Item;
 
 function hasErrors(fieldsError) {
@@ -49,7 +52,7 @@ class HorizontalSignInForm extends React.Component {
             <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
           )}
         </FormItem>
-        <FormItem>
+        <FormItem className="submitButton">
           <Button
             type="primary"
             htmlType="submit"
