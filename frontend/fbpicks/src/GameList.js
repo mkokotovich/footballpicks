@@ -30,11 +30,13 @@ class GameList extends Component {
     );
   }
 
-  componentDidMount() {
+  retrieveGames() {
+    /* Special workaround for funny DB entries for season 2015 */
+    const season = this.props.season == 2015 ? 0 : this.props.season;
     axios.get('/api/v1/games/', {
         params: {
-          season: this.props.season,
-          week: this.props.week,
+          season: season,
+          week: this.state.week,
         }
       })
       .then((response) => {
@@ -44,6 +46,16 @@ class GameList extends Component {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  componentDidMount() {
+    this.retrieveGames();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.season != this.props.season) {
+      this.retrieveGames();
+    }
   }
 }
 
