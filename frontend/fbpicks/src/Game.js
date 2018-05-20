@@ -10,22 +10,24 @@ import './Game.css'
 function Game(props) {
   return (
     <div className="Game">
-      <Row type="flex" justify="center" align="top">
-        <Col span={10}>
-          <Team team={props.game.away_team} />
+      <Row type="flex" justify="center" align="top" gutter={10}>
+        <Col xs={10}>
+          <Team team={props.game.away_team} home={false} />
           { props.display_picks && 
             <PickList team={props.game.away_team}
-                      picks={props.game.picks} />
+                      picks={props.game.picks}
+                      home={false} />
           }
         </Col>
-        <Col span={4}>
+        <Col xs={4}>
           <GameTime game={props.game} />
         </Col>
-        <Col span={10}>
-          <Team team={props.game.home_team} />
+        <Col xs={10}>
+          <Team team={props.game.home_team} home={true} />
           { props.display_picks && 
             <PickList team={props.game.home_team}
-                      picks={props.game.picks} />
+                      picks={props.game.picks} 
+                      home={true} />
           }
         </Col>
       </Row>

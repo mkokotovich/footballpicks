@@ -1,4 +1,5 @@
 import React from 'react';
+import { Row, Col } from 'antd';
 
 import Pick from './Pick';
 import './PickList.css';
@@ -10,9 +11,19 @@ function PickList(props) {
     }
     return picks_for_team;
   }, []);
+
+  const justify = props.home === true ? "start" : "end";
+  const textStyle = {
+    textAlign: props.home === true ? "left" : "right",
+  };
+
   return (
     <div className="PickList">
-      {picks_for_team.map((pick, i) => <Pick pick={pick} key={i} />)}
+      <Row type="flex" justify={justify} style={textStyle} >
+        <Col>
+          {picks_for_team.map((pick, i) => <Pick pick={pick} key={i} />)}
+        </Col>
+      </Row>
     </div>
   );
 }

@@ -1,17 +1,18 @@
 import React from 'react';
+import moment from 'moment';
+
+import './GameTime.css'
 
 function GameTime(props) {
-  const monthNames = ["Jan", "Feb", "Mar", "April", "May", "June",
-    "July", "Aug", "Sept", "Oct", "Nov", "Dec" ];
-
-  const date = new Date(props.game.game_time);
-  const month = monthNames[date.getMonth()]
+  const momentDate = moment(new Date(props.game.game_time))
 
   return (
     <div className="GameTime">
-      at
+      {momentDate.format('dddd')}
       <br/>
-      {month} {date.getDate()}, {date.toLocaleTimeString()}
+      {momentDate.format('MMM')} {momentDate.format('Do')}, {momentDate.format('YYYY')}
+      <br/>
+      {momentDate.format('LT')}
     </div>
   );
 }

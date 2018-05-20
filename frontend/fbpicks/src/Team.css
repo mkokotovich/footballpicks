@@ -1,6 +1,6 @@
 .TeamName {
   font-size: 1.875em;
-  margin-right: 5px;
+  line-height: 50%;
 }
 .TeamRecord {
   white-space: nowrap;
