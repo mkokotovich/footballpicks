@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
-import { Tabs, Row, Col, Select } from 'antd';
+import { Affix, Button, Tabs, Row, Col, Select } from 'antd';
 
 import GameList from './GameList';
+
+import './Home.css';
 
 const TabPane = Tabs.TabPane;        
 const Option = Select.Option;
