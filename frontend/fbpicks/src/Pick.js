@@ -5,7 +5,9 @@ import './Pick.css';
 function Pick(props) {
   return (
     <span className="Pick">
-      {props.pick.user_name} &nbsp;
+      { props.home !== true && <span> &nbsp;</span> }
+      { props.pick.user_name }
+      { props.home === true && <span> &nbsp;</span> }
     </span>
   );
 }

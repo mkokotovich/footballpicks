@@ -13,22 +13,20 @@ function Game(props) {
       <Row type="flex" justify="center" align="top" gutter={10}>
         <Col xs={10}>
           <Team team={props.game.away_team} home={false} />
-          { props.display_picks && 
-            <PickList team={props.game.away_team}
+          <PickList team={props.game.away_team}
                       picks={props.game.picks}
-                      home={false} />
-          }
+                      home={false} 
+                      display={props.display_picks} />
         </Col>
         <Col xs={4}>
           <GameTime game={props.game} />
         </Col>
         <Col xs={10}>
           <Team team={props.game.home_team} home={true} />
-          { props.display_picks && 
-            <PickList team={props.game.home_team}
-                      picks={props.game.picks} 
-                      home={true} />
-          }
+          <PickList team={props.game.home_team}
+                    picks={props.game.picks} 
+                    home={true}
+                    display={props.display_picks} />
         </Col>
       </Row>
       <br/>

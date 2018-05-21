@@ -18,13 +18,16 @@ function PickList(props) {
   };
 
   return (
-    <div className="PickList">
-      <Row type="flex" justify={justify} style={textStyle} >
-        <Col>
-          {picks_for_team.map((pick, i) => <Pick pick={pick} key={i} />)}
-        </Col>
-      </Row>
-    </div>
+    <Row type="flex" justify={justify} style={textStyle} >
+      <Col>
+        { props.home !== true && <span> &nbsp; </span> }
+        {
+          props.display &&
+          picks_for_team.map((pick, i) => <Pick pick={pick} key={i} home={props.home}/>)
+        }
+        { props.home === true && <span> &nbsp; </span> }
+      </Col>
+    </Row>
   );
 }
 
