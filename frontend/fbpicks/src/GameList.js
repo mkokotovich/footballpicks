@@ -37,7 +37,7 @@ class GameList extends Component {
           <Col xs={24} sm={10}>
             <Affix>
             <div className="AlignRight">
-              <Button className="TopRightButton" type="primary">Submit picks</Button>
+              <Button className="TopRightButton" type="primary">Enter your picks</Button>
               <Button className="TopRightButton" onClick={this.handleShowHidePicks}>{showPicksText}</Button>
             </div>
             </Affix>
