@@ -16,9 +16,11 @@ class GameList extends Component {
   constructor(props) {
     super(props);
     this.handleShowHidePicks = this.handleShowHidePicks.bind(this);
+    this.handleEnterSubmit = this.handleEnterSubmit.bind(this);
     this.state = {
       games: [],
-      showPicks: false
+      showPicks: false,
+      submitting: false
     };
   }
 
@@ -26,8 +28,14 @@ class GameList extends Component {
     this.setState({showPicks: !this.state.showPicks});
   }
 
+  handleEnterSubmit() {
+    this.setState({submitting: !this.state.submitting,
+                   showPicks: this.state.submitting});
+  }
+
   render() {
     const showPicksText = this.state.showPicks ? "Hide Picks" : "Show Picks";
+    const enterSubmitText = this.state.submitting ? "Submit your picks" : "Enter your picks";
     return (
       <div className="GameList">
         <Row type="flex">
@@ -37,15 +45,27 @@ class GameList extends Component {
           <Col xs={24} sm={10}>
             <Affix>
             <div className="AlignRight">
-              <Button className="TopRightButton" type="primary">Enter your picks</Button>
-              <Button className="TopRightButton" onClick={this.handleShowHidePicks}>{showPicksText}</Button>
+              <Button
+                className="TopRightButton"
+                type="primary"
+                onClick={this.handleEnterSubmit}>
+                  {enterSubmitText}
+              </Button>
+              { !this.state.submitting && 
+                <Button
+                  className="TopRightButton"
+                  onClick={this.handleShowHidePicks}>
+                    {showPicksText}
+                </Button>
+              }
             </div>
             </Affix>
           </Col>
         </Row>
         {this.state.games.map((game, i) => <Game game={game}
                                                  key={i}
-                                                 display_picks={this.state.showPicks} />)}
+                                                 display_picks={this.state.showPicks}
+                                                 submitting={this.state.submitting} />)}
       </div>
     );
   }
