@@ -12,7 +12,14 @@ function Game(props) {
     <div className="Game">
       <Row type="flex" justify="center" align="top" gutter={10}>
         <Col xs={10}>
-          <Team team={props.game.away_team} home={false} />
+          <Team
+            team={props.game.away_team}
+            home={false}
+            submitting={props.submitting}
+            gameID={props.gameID}
+            handleSetPick={props.handleSetPick}
+            checked={props.selected}
+          />
           <PickList team={props.game.away_team}
                       picks={props.game.picks}
                       home={false} 
@@ -22,7 +29,14 @@ function Game(props) {
           <GameTime game={props.game} />
         </Col>
         <Col xs={10}>
-          <Team team={props.game.home_team} home={true} />
+          <Team
+            team={props.game.home_team}
+            home={true}
+            submitting={props.submitting}
+            gameID={props.gameID}
+            handleSetPick={props.handleSetPick}
+            checked={props.selected}
+          />
           <PickList team={props.game.home_team}
                     picks={props.game.picks} 
                     home={true}

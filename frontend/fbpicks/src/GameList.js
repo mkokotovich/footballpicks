@@ -17,11 +17,20 @@ class GameList extends Component {
     super(props);
     this.handleShowHidePicks = this.handleShowHidePicks.bind(this);
     this.handleEnterSubmit = this.handleEnterSubmit.bind(this);
+    this.handleCancelPicks = this.handleCancelPicks.bind(this);
+    this.handleSetPick = this.handleSetPick.bind(this);
     this.state = {
       games: [],
+      picksToSubmit: [],
       showPicks: false,
       submitting: false
     };
+  }
+
+  handleSetPick(gameIndex, teamID) {
+    const picksToSubmit = this.state.picksToSubmit;
+    picksToSubmit[gameIndex] = teamID;
+    this.setState({picksToSubmit: picksToSubmit});
   }
 
   handleShowHidePicks() {
@@ -31,6 +40,11 @@ class GameList extends Component {
   handleEnterSubmit() {
     this.setState({submitting: !this.state.submitting,
                    showPicks: this.state.submitting});
+  }
+
+  handleCancelPicks() {
+    this.setState({submitting: false,
+                   showPicks: false});
   }
 
   render() {
@@ -45,12 +59,13 @@ class GameList extends Component {
           <Col xs={24} sm={10}>
             <Affix>
             <div className="AlignRight">
-              <Button
-                className="TopRightButton"
-                type="primary"
-                onClick={this.handleEnterSubmit}>
-                  {enterSubmitText}
-              </Button>
+              { this.state.submitting && 
+                <Button
+                  className="TopRightButton"
+                  onClick={this.handleCancelPicks}>
+                    Cancel
+                </Button>
+              }
               { !this.state.submitting && 
                 <Button
                   className="TopRightButton"
@@ -58,13 +73,22 @@ class GameList extends Component {
                     {showPicksText}
                 </Button>
               }
+              <Button
+                className="TopRightButton"
+                type="primary"
+                onClick={this.handleEnterSubmit}>
+                  {enterSubmitText}
+              </Button>
             </div>
             </Affix>
           </Col>
         </Row>
         {this.state.games.map((game, i) => <Game game={game}
                                                  key={i}
+                                                 gameID={i}
                                                  display_picks={this.state.showPicks}
+                                                 selected={this.state.picksToSubmit.length > 0 ? this.state.picksToSubmit[i] : false}
+                                                 handleSetPick={this.handleSetPick}
                                                  submitting={this.state.submitting} />)}
       </div>
     );
@@ -82,6 +106,7 @@ class GameList extends Component {
       .then((response) => {
         const games = response.data.results;
         this.setState({ "games": games });
+        this.setState({ "picksToSubmit": Array(this.state.games.length).fill(false) });
       })
       .catch((error) => {
         console.log(error);
