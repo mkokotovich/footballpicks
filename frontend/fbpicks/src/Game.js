@@ -18,7 +18,7 @@ function Game(props) {
             submitting={props.submitting}
             gameID={props.gameID}
             handleSetPick={props.handleSetPick}
-            checked={props.selected}
+            checked={props.selectedTeam === props.game.away_team.id}
           />
           <PickList team={props.game.away_team}
                       picks={props.game.picks}
@@ -35,7 +35,7 @@ function Game(props) {
             submitting={props.submitting}
             gameID={props.gameID}
             handleSetPick={props.handleSetPick}
-            checked={props.selected}
+            checked={props.selectedTeam === props.game.home_team.id}
           />
           <PickList team={props.game.home_team}
                     picks={props.game.picks} 

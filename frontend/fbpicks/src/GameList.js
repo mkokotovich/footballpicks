@@ -38,8 +38,23 @@ class GameList extends Component {
   }
 
   handleEnterSubmit() {
-    this.setState({submitting: !this.state.submitting,
-                   showPicks: this.state.submitting});
+    const submitting = this.state.submitting;
+    this.setState({submitting: !submitting,
+                   showPicks: submitting});
+
+    if (submitting) {
+      this.submitPicks();
+    }
+  }
+
+  submitPicks() {
+    const picks = this.state.games.map((game, i) => {
+      return {
+        "game": game.id,
+        "team_to_win": this.state.picksToSubmit[i]
+      };
+    });
+    console.log(picks);
   }
 
   handleCancelPicks() {
@@ -87,7 +102,7 @@ class GameList extends Component {
                                                  key={i}
                                                  gameID={i}
                                                  display_picks={this.state.showPicks}
-                                                 selected={this.state.picksToSubmit.length > 0 ? this.state.picksToSubmit[i] : false}
+                                                 selectedTeam={this.state.picksToSubmit[i]}
                                                  handleSetPick={this.handleSetPick}
                                                  submitting={this.state.submitting} />)}
       </div>
@@ -106,7 +121,7 @@ class GameList extends Component {
       .then((response) => {
         const games = response.data.results;
         this.setState({ "games": games });
-        this.setState({ "picksToSubmit": Array(this.state.games.length).fill(false) });
+        this.setState({ "picksToSubmit": Array(this.state.games.length).fill(null) });
       })
       .catch((error) => {
         console.log(error);

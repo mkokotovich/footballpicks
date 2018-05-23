@@ -7,12 +7,14 @@ class Team extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      checked: props.selected
+      checked: props.checked
     };
+    this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick = () => (e) => {
+  handleClick(event) {
     this.props.handleSetPick(this.props.gameID, this.props.team.id);
+    this.setState({checked: event.target.checked});
   }
 
   render() {
@@ -22,14 +24,20 @@ class Team extends Component {
     const textStyle = {
       textAlign: this.props.home === true ? "left" : "right",
     };
+    const checkboxStyle = {
+      marginLeft: this.props.home ? "0px" : "5px",
+      marginRight: this.props.home ? "5px" : "0px",
+      verticalAlign: "4px",
+    }
     const labelID = this.props.home ? "home" + this.props.gameID : "away" + this.props.gameID;
     const checkbox = (
       <input
         type="checkbox"
         name={labelID}
+        style={checkboxStyle}
         id={labelID}
         checked={this.state.checked}
-        onChange={this.props.handleClick} />
+        onChange={this.handleClick} />
     );
     const teamNameOnly = (
       <span className="TeamName">
@@ -75,6 +83,16 @@ class Team extends Component {
         </Col>
       </Row>
     );
+  }
+
+  /*
+   * TODO
+  https://reactjs.org/docs/forms.html#handling-multiple-inputs
+  */
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.checked !== this.props.checked) {
+      this.setState({checked: this.props.checked});
+    }
   }
 }
 

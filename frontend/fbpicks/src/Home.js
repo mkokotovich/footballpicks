@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Affix, Button, Tabs, Row, Col, Select } from 'antd';
+import { Tabs, Row, Col, Select } from 'antd';
 
 import GameList from './GameList';
 
