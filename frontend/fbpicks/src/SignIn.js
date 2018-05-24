@@ -31,6 +31,10 @@ class SignIn extends React.Component {
     if (token) {
       this.signInWithToken(token);
     }
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.props.handleAuthChange(user);
+    }
   }
 
   signInWithToken(token) {
@@ -56,6 +60,7 @@ class SignIn extends React.Component {
 	this.signInWithToken(token);
 	if (user) {
 	  localStorage.setItem('user', JSON.stringify(user));
+	  this.props.handleAuthChange(user);
 	}
       } else {
 	console.log("Failed to sign in " + username);
@@ -79,6 +84,7 @@ class SignIn extends React.Component {
   handleSignOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("user");
+    this.props.handleAuthChange({});
     delete axios.defaults.headers.common["Authorization"];
 
     console.log("Signed out");

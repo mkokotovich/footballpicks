@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Affix, Button, Spin, Col, Row } from 'antd';
+import { Affix, Button, Modal, Spin, Col, Row, Tooltip } from 'antd';
 
 import './GameList.css';
 
@@ -24,7 +24,8 @@ class GameList extends Component {
       picksToSubmit: [],
       showPicks: (props.showPicks === undefined) ? false : props.showPicks,
       submitting: false,
-      loading: false
+      loading: false,
+      user: ""
     };
   }
 
@@ -71,6 +72,11 @@ class GameList extends Component {
       .catch((error) => {
         console.log(error);
         this.setState({loading: false});
+        Modal.error({
+          title: "Unable to submit picks",
+          content: "Unable to submit your picks. Please try again\n\n" + error,
+          maskClosable: true,
+        })
       });
   }
 
@@ -78,10 +84,35 @@ class GameList extends Component {
     this.setState({submitting: false,
                    showPicks: false});
   }
+  
+  isEmpty(ob) {
+    for(var i in ob) {
+      return false;
+    }
+    return true;
+  }
 
   render() {
     const showPicksText = this.state.showPicks ? "Hide Picks" : "Show Picks";
     const enterSubmitText = this.state.submitting ? "Submit your picks" : "Enter your picks";
+    const enterSubmitButton = this.isEmpty(this.props.signedInUser) ? (
+      <Tooltip title="Sign in to submit picks">
+        <Button
+          className="TopRightButton"
+          type="primary"
+          disabled="true"
+          onClick={this.handleEnterSubmit}>
+            {enterSubmitText}
+        </Button>
+      </Tooltip>
+    ) : (
+      <Button
+        className="TopRightButton"
+        type="primary"
+        onClick={this.handleEnterSubmit}>
+          {enterSubmitText}
+      </Button>
+    );
     return (
       <div className="GameList">
         <Row type="flex">
@@ -105,12 +136,7 @@ class GameList extends Component {
                     {showPicksText}
                 </Button>
               }
-              <Button
-                className="TopRightButton"
-                type="primary"
-                onClick={this.handleEnterSubmit}>
-                  {enterSubmitText}
-              </Button>
+              { enterSubmitButton }
             </div>
             </Affix>
           </Col>
@@ -150,6 +176,11 @@ class GameList extends Component {
       .catch((error) => {
         console.log(error);
         this.setState({loading: false});
+        Modal.error({
+          title: "Unable to load games",
+          content: "Unable to load games. Please try again.\n\n" + error,
+          maskClosable: true,
+        })
       });
   }
 

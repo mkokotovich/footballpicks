@@ -9,7 +9,15 @@ import './App.css';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { };
+    this.state = {
+      user: {}
+    };
+  }
+
+  handleAuthChange = (user) => {
+    this.setState({
+      user: user,
+    });
   }
 
   render() {
@@ -22,9 +30,9 @@ class App extends Component {
           align="middle"
           >
           <Col className="Logo">Football Picks</Col>
-          <Col><SignIn /></Col>
+          <Col><SignIn handleAuthChange={this.handleAuthChange} /></Col>
         </Row>
-        <Home currentSeason="2016" currentWeek="1" />
+        <Home currentSeason="2016" currentWeek="1" signedInUser={this.state.user} />
       </div>
     );
   }

@@ -49,7 +49,8 @@ class Home extends Component {
                     season={this.state.season}
                     week={week}
                     showPicks={this.state.showPicks}
-                    handleShowPicks = {this.handleShowPicks} />
+                    handleShowPicks = {this.handleShowPicks} 
+                    signedInUser = {this.props.signedInUser} />
                 </TabPane>)}
             </Tabs>
           </Col>
