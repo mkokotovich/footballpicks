@@ -32,6 +32,16 @@ class PickViewSet(viewsets.ModelViewSet):
     ordering = "-id"
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def get_serializer(self, *args, **kwargs):
+        if "data" in kwargs:
+            data = kwargs["data"]
+
+            # check if many is required
+            if isinstance(data, list):
+                kwargs["many"] = True
+
+        return super().get_serializer(*args, **kwargs)
+
 
 class RecordViewSet(viewsets.ModelViewSet):
     queryset = Record.objects.all()

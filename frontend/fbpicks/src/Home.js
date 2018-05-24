@@ -12,9 +12,16 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.handleShowPicks = this.handleShowPicks.bind(this);
     this.state = {
-      season: props.currentSeason
+      season: props.currentSeason,
+      showPicks: false
     };
+  }
+
+  handleShowPicks(showPicks) {
+    console.log("Updating show picks: " + showPicks);
+    this.setState({showPicks: showPicks});
   }
 
   handleChange(value) {
@@ -36,7 +43,14 @@ class Home extends Component {
               defaultActiveKey={this.props.currentWeek}
               tabPosition="top"
             >
-              {weeks.map((week, i) => <TabPane tab={"Week " + week} key={week}><GameList season={this.state.season} week={week} /></TabPane>)}
+              {weeks.map((week, i) =>
+                <TabPane tab={"Week " + week} key={week}>
+                  <GameList
+                    season={this.state.season}
+                    week={week}
+                    showPicks={this.state.showPicks}
+                    handleShowPicks = {this.handleShowPicks} />
+                </TabPane>)}
             </Tabs>
           </Col>
         </Row>

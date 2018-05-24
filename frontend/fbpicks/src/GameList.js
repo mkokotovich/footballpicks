@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Affix, Button, Col, Row } from 'antd';
+import { Affix, Button, Spin, Col, Row } from 'antd';
 
 import './GameList.css';
 
@@ -22,8 +22,9 @@ class GameList extends Component {
     this.state = {
       games: [],
       picksToSubmit: [],
-      showPicks: false,
-      submitting: false
+      showPicks: (props.showPicks === undefined) ? false : props.showPicks,
+      submitting: false,
+      loading: false
     };
   }
 
@@ -34,7 +35,11 @@ class GameList extends Component {
   }
 
   handleShowHidePicks() {
-    this.setState({showPicks: !this.state.showPicks});
+    const newShowPicks = !this.state.showPicks;
+    this.setState({showPicks: newShowPicks});
+    if (this.props.handleShowPicks !== undefined) {
+      this.props.handleShowPicks(newShowPicks);
+    }
   }
 
   handleEnterSubmit() {
@@ -48,13 +53,25 @@ class GameList extends Component {
   }
 
   submitPicks() {
+    this.setState({loading: true});
     const picks = this.state.games.map((game, i) => {
       return {
         "game": game.id,
         "team_to_win": this.state.picksToSubmit[i]
       };
+    }).filter((pick) => {
+      return pick.team_to_win !== null;
     });
-    console.log(picks);
+    axios.post('/api/v1/picks/', picks)
+      .then((response) => {
+        console.log(response);
+        this.setState({games: []});
+        this.retrieveGames();
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({loading: false});
+      });
   }
 
   handleCancelPicks() {
@@ -98,6 +115,11 @@ class GameList extends Component {
             </Affix>
           </Col>
         </Row>
+        <Row type="flex" justify="center">
+          <Col>
+            { this.state.loading && <Spin size="large" /> }
+          </Col>
+        </Row>
         {this.state.games.map((game, i) => <Game game={game}
                                                  key={i}
                                                  gameID={i}
@@ -110,6 +132,7 @@ class GameList extends Component {
   }
 
   retrieveGames() {
+    this.setState({loading: true});
     /* Special workaround for funny DB entries for season 2015 */
     const season = this.props.season === 2015 ? 0 : this.props.season;
     axios.get('/api/v1/games/', {
@@ -120,11 +143,13 @@ class GameList extends Component {
       })
       .then((response) => {
         const games = response.data.results;
+        this.setState({loading: false});
         this.setState({ "games": games });
         this.setState({ "picksToSubmit": Array(this.state.games.length).fill(null) });
       })
       .catch((error) => {
         console.log(error);
+        this.setState({loading: false});
       });
   }
 

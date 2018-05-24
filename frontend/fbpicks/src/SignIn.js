@@ -35,7 +35,9 @@ class SignIn extends React.Component {
 
   signInWithToken(token) {
     localStorage.setItem('id_token', token);
-    axios.defaults.headers.common['Authorization'] = token;
+    axios.defaults.headers.common['Authorization'] = "Bearer " + token;
+    axios.defaults.xsrfCookieName = "csrftoken";
+    axios.defaults.xsrfHeaderName = "X-CSRFToken";
     this.setState({isSignedIn: true});
   }
 
@@ -48,6 +50,7 @@ class SignIn extends React.Component {
     .then((response) => {
       const token = response.data.token;
       const user = response.data.user;
+      console.log(response.headers);
       if (token) {
 	console.log("Signed in " + username);
 	this.signInWithToken(token);
