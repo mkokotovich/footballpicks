@@ -34,6 +34,10 @@ class Team extends Component {
     const smPull = this.props.home ? 22 : 0;
     const mdPush = this.props.home ? 1 : 0;
     const mdPull = this.props.home ? 23 : 0;
+    const smRecordPush = this.props.home && this.props.submitting ? 2 : 0;
+    const smRecordPull = !this.props.home && this.props.submitting ? 2 : 0;
+    const mdRecordPush = this.props.home && this.props.submitting ? 1 : 0;
+    const mdRecordPull = !this.props.home && this.props.submitting ? 1 : 0;
     const checkbox = (
       <input
         type="checkbox"
@@ -76,7 +80,7 @@ class Team extends Component {
         <Col span={24}>
           { teamName }
           <Row>
-            <Col>
+            <Col xs={24} sm={{ push: smRecordPush, pull: smRecordPull }} md={{ push: mdRecordPush, pull: mdRecordPull }}>
               <span className="TeamRecord">
                 {recordString}
               </span>
@@ -87,10 +91,6 @@ class Team extends Component {
     );
   }
 
-  /*
-   * TODO
-  https://reactjs.org/docs/forms.html#handling-multiple-inputs
-  */
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.checked !== this.props.checked) {
       this.setState({checked: this.props.checked});
