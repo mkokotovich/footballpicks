@@ -35,6 +35,9 @@ class GameList extends Component {
   }
 
   loadInitialPicksForUser() {
+    if (this.props.signedInUser === null) {
+      return;
+    }
     const picksToSubmit = this.state.games.map((game, i) => {
       const user_pick = game.picks.filter((pick) => {
         if (pick.user_name == this.props.signedInUser.first_name) {
@@ -112,17 +115,10 @@ class GameList extends Component {
                    showPicks: false});
   }
   
-  isEmpty(ob) {
-    for(var i in ob) {
-      return false;
-    }
-    return true;
-  }
-
   render() {
     const showPicksText = this.state.showPicks ? "Hide Picks" : "Show Picks";
     const enterSubmitText = this.state.submitting ? "Submit your picks" : "Enter your picks";
-    const enterSubmitButton = this.isEmpty(this.props.signedInUser) ? (
+    const enterSubmitButton = this.props.signedInUser === null ? (
       <Tooltip title="Sign in to submit picks">
         <Button
           className="TopRightButton"

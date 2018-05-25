@@ -15,9 +15,8 @@ class App extends Component {
   }
 
   handleAuthChange = (user) => {
-    const userObject = JSON.parse(user);
     this.setState({
-      user: userObject,
+      user: user,
     });
   }
 

@@ -33,7 +33,7 @@ class SignIn extends React.Component {
     }
     const user = localStorage.getItem('user');
     if (user) {
-      this.props.handleAuthChange(user);
+      this.props.handleAuthChange(JSON.parse(user));
     }
   }
 
@@ -84,7 +84,7 @@ class SignIn extends React.Component {
   handleSignOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("user");
-    this.props.handleAuthChange({});
+    this.props.handleAuthChange(null);
     delete axios.defaults.headers.common["Authorization"];
 
     console.log("Signed out");
