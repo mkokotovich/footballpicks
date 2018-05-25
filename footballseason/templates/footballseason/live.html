@@ -52,7 +52,7 @@
         </tr>
         <tr class={% if forloop.counter|divisibleby:2 %}"base"{% else %}"alt"{% endif %}>
             <td class="picks">
-                {% for pick in entry.0.pick_set.all %}
+                {% for pick in entry.0.picks.all %}
                 {% if pick.team_to_win == entry.0.away_team %}
                 {{ pick.user_name }} &nbsp;
                 {% endif %}
@@ -61,7 +61,7 @@
             <td>
             </td>
             <td class="picks">
-                {% for pick in entry.0.pick_set.all %}
+                {% for pick in entry.0.picks.all %}
                 {% if pick.team_to_win == entry.0.home_team %}
                 {{ pick.user_name }} &nbsp;
                 {% endif %}

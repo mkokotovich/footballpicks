@@ -40,7 +40,7 @@ class Command(BaseCommand):
             return
 
         LOG.info(f"Updating winners for {last_game}")
-        winning_picks = last_game.pick_set.filter(team_to_win=team)
+        winning_picks = last_game.picks.filter(team_to_win=team)
         for pick in winning_picks:
             try:
                 record = Record.objects.get(user_name=pick.user_name, season=fb_utils.get_season(), week=last_game_week)

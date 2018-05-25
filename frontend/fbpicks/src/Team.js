@@ -30,6 +30,10 @@ class Team extends Component {
       verticalAlign: "4px",
     }
     const labelID = this.props.home ? "home" + this.props.gameID : "away" + this.props.gameID;
+    const smPush = this.props.home ? 2 : 0;
+    const smPull = this.props.home ? 22 : 0;
+    const mdPush = this.props.home ? 1 : 0;
+    const mdPull = this.props.home ? 23 : 0;
     const checkbox = (
       <input
         type="checkbox"
@@ -44,36 +48,34 @@ class Team extends Component {
         {this.props.team.team_name} 
       </span> 
     );
-    const nameAndCheck = this.props.home ? (
-      <label>
-        { checkbox }
-        { teamNameOnly }
-      </label>
-    ) : (
-      <label>
-        { teamNameOnly }
-        { checkbox }
-      </label>
-    );
     const teamName = this.props.submitting ? (
-      <form>
-        { nameAndCheck }
-      </form>
+      <Row type="flex" justify={justify} >
+        <form style={{width: "100%"}}>
+          <label>
+            <Col xs={24} sm={{ span: 22, push: smPush}} md={{ span: 23, push: mdPush}}>
+              { teamNameOnly }
+            </Col>
+            <Col xs={24} sm={{span: 2, pull: smPull}} md={{ span: 1, pull: mdPull}}>
+              { checkbox }
+            </Col>
+          </label>
+        </form>
+      </Row>
     ) : (
-      <span className="TeamName">
-        {this.props.team.team_name} 
-      </span> 
+      <Row type="flex" justify={justify}>
+        <Col>
+        <span className="TeamName">
+          {this.props.team.team_name} 
+        </span> 
+        </Col>
+      </Row>
     );
 
     return (
       <Row type="flex" justify={justify} style={textStyle}>
-        <Col>
-          <Row type="flex" justify={justify}>
-            <Col>
-              { teamName }
-            </Col>
-          </Row>
-          <Row type="flex" justify={justify}>
+        <Col span={24}>
+          { teamName }
+          <Row>
             <Col>
               <span className="TeamRecord">
                 {recordString}

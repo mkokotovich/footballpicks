@@ -41,7 +41,7 @@ def update_records(team):
         LOG.error("Error: Unable to find game to update records. Team: {0}".format(team))
         return 0
 
-    winning_picks = last_game.pick_set.filter(team_to_win=team)
+    winning_picks = last_game.picks.filter(team_to_win=team)
     for pick in winning_picks:
         try:
             record = Record.objects.get(user_name=pick.user_name, season=utils.get_season(), week=last_game_week)
@@ -113,7 +113,7 @@ def submit(request, season_id, week_id):
     for game in games_list:
         side = ''
         try:
-            pick = game.pick_set.get(user_name=request.user.first_name)
+            pick = game.picks.get(user_name=request.user.first_name)
             if (pick.team_to_win == game.home_team):
                 side = 'home'
             elif (pick.team_to_win == game.away_team):
@@ -176,7 +176,7 @@ def vote(request, season_id, week_id):
 
             # A team was selected, first look to see if a pick already exists
             try:
-                pick = game.pick_set.get(user_name=name)
+                pick = game.picks.get(user_name=name)
                 # An existing pick was found, update selection
                 pick.team_to_win=team_selected
                 pick.date_submitted=date_submitted
