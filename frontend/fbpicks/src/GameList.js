@@ -24,14 +24,30 @@ class GameList extends Component {
       picksToSubmit: [],
       showPicks: (props.showPicks === undefined) ? false : props.showPicks,
       submitting: false,
-      loading: false,
-      user: ""
+      loading: false
     };
   }
 
   handleSetPick(gameIndex, teamID) {
     const picksToSubmit = this.state.picksToSubmit;
     picksToSubmit[gameIndex] = teamID;
+    this.setState({picksToSubmit: picksToSubmit});
+  }
+
+  loadInitialPicksForUser() {
+    const picksToSubmit = this.state.games.map((game, i) => {
+      const user_pick = game.picks.filter((pick) => {
+        if (pick.user_name == this.props.signedInUser.first_name) {
+          return true;
+        }
+        return false;
+      });
+      if (user_pick.length > 0) {
+        return user_pick[0].team_to_win;
+      } else {
+        return null;
+      }
+    });
     this.setState({picksToSubmit: picksToSubmit});
   }
 
@@ -45,16 +61,16 @@ class GameList extends Component {
 
   handleEnterSubmit() {
     const submitting = this.state.submitting;
-    this.setState({submitting: !submitting,
-                   showPicks: submitting});
 
     if (submitting) {
       this.submitPicks();
+    } else {
+      this.setState({submitting: !submitting,
+                     showPicks: submitting});
     }
   }
 
   submitPicks() {
-    this.setState({loading: true});
     const picks = this.state.games.map((game, i) => {
       return {
         "game": game.id,
@@ -63,11 +79,22 @@ class GameList extends Component {
     }).filter((pick) => {
       return pick.team_to_win !== null;
     });
+    if (picks.length === 0) {
+      Modal.error({
+        title: "Empty selection",
+        content: "Select who you think will win by clicking the checkbox next to the team name.",
+        maskClosable: true,
+      })
+      return;
+    }
+    this.setState({loading: true});
     axios.post('/api/v1/picks/', picks)
       .then((response) => {
         console.log(response);
         this.setState({games: []});
         this.retrieveGames();
+        this.setState({submitting: false,
+                       showPicks: true});
       })
       .catch((error) => {
         console.log(error);
@@ -152,7 +179,8 @@ class GameList extends Component {
                                                  display_picks={this.state.showPicks}
                                                  selectedTeam={this.state.picksToSubmit[i]}
                                                  handleSetPick={this.handleSetPick}
-                                                 submitting={this.state.submitting} />)}
+                                                 submitting={this.state.submitting}
+                                                 signedInUser={this.props.signedInUser} />)}
       </div>
     );
   }
@@ -172,6 +200,7 @@ class GameList extends Component {
         this.setState({loading: false});
         this.setState({ "games": games });
         this.setState({ "picksToSubmit": Array(this.state.games.length).fill(null) });
+        this.loadInitialPicksForUser();
       })
       .catch((error) => {
         console.log(error);

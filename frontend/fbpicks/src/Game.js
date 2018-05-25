@@ -21,9 +21,9 @@ function Game(props) {
             checked={props.selectedTeam === props.game.away_team.id}
           />
           <PickList team={props.game.away_team}
-                      picks={props.game.picks}
-                      home={false} 
-                      display={props.display_picks} />
+                    picks={props.game.picks}
+                    home={false} 
+                    display={props.display_picks} />
         </Col>
         <Col xs={4}>
           <GameTime game={props.game} />

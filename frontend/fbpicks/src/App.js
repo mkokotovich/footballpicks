@@ -10,13 +10,14 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: {}
+      user: null
     };
   }
 
   handleAuthChange = (user) => {
+    const userObject = JSON.parse(user);
     this.setState({
-      user: user,
+      user: userObject,
     });
   }
 

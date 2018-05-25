@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username')
+        fields = ('id', 'username', 'first_name')
 
 
 class TeamSerializer(serializers.ModelSerializer):
