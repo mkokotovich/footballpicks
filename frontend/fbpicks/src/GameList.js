@@ -8,7 +8,11 @@ import Game from './Game';
 
 function GameListWeekMessage(props) {
   return (
-    <span className="GameListWeekMessage">Games for Week {props.week}, {props.season}</span>
+    <Row type="flex" justify="start" align="bottom">
+      <Col xs={24} sm={{push: 2}} md={{push: 4}}>
+        <span className="GameListWeekMessage">Games for Week {props.week}, {props.season}</span>
+      </Col>
+    </Row>
   );
 }
 
@@ -138,7 +142,7 @@ class GameList extends Component {
     );
     return (
       <div className="GameList">
-        <Row type="flex">
+        <Row type="flex" style={{ marginBottom: "15px"}} align="bottom">
           <Col xs={24} sm={14}>
             {GameListWeekMessage(this.props)}
           </Col>

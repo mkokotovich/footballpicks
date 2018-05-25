@@ -1,9 +1,13 @@
 .navbar {
-  background-color: silver;
+  background-color: #c1946a;
   padding: 0px 10px 0px 10px;
 }
 
 .Logo {
   font-family: 'Gloria Hallelujah', cursive;
   font-size: 3em;
+}
+
+body {
+  background-color: #F0F2F0;
 }
