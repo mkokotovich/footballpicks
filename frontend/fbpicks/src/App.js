@@ -32,7 +32,7 @@ class App extends Component {
           <Col className="Logo">Football Picks</Col>
           <Col><SignIn handleAuthChange={this.handleAuthChange} /></Col>
         </Row>
-        <Home currentSeason="2016" currentWeek="1" signedInUser={this.state.user} />
+        <Home currentSeason="2018" currentWeek="1" signedInUser={this.state.user} />
       </div>
     );
   }
