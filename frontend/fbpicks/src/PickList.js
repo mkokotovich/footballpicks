@@ -6,9 +6,7 @@ import './PickList.css';
 
 function PickList(props) {
   const picks_for_team = props.picks.filter((pick) => {
-    if (pick.team_to_win === props.team.id) {
-      return true;
-    }
+    return (pick.team_to_win === props.team.id);
   });
 
   const justify = props.home === true ? "start" : "end";
