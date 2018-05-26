@@ -13,3 +13,11 @@
 .GameListWeekMessage {
   font-size: 2em;
 }
+
+.roundedDivider {
+  height: 6px;
+  width: 85%;
+  border-radius: 3px;
+  background-color: #8e662f;
+  margin-bottom: 30px;
+}

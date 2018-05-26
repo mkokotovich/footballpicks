@@ -169,6 +169,11 @@ class GameList extends Component {
           </Col>
         </Row>
         <Row type="flex" justify="center">
+          <Col className="roundedDivider">
+            &nbsp;
+          </Col>
+        </Row>
+        <Row type="flex" justify="center">
           <Col>
             { this.state.loading && <Spin size="large" /> }
           </Col>
