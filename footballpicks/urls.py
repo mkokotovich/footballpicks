@@ -24,6 +24,7 @@ from rest_framework.reverse import reverse
 
 urlpatterns = [
     url(r'^footballseason/', include('footballseason.urls')),
+    url(r'^old/', include('footballseason.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^login/$', auth_views.LoginView.as_view(template_name='footballseason/login.html'), name="login"),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name="logout"),

@@ -1,1 +1,1 @@
-web: gunicorn footballpicks.wsgi --log-file -
+web: bin/start-nginx python server.py
