@@ -9,14 +9,14 @@
 <p>Your username and password didn't match!
 Please try again!</p>
 {% endif %}
-<form action="/login/" method="post" >
+<form action="/footballseason/login/" method="post" >
 {% csrf_token %}
 <p><label for="id_username">Username:</label>{{ form.username }}</p>
 <p><label for="id_password">Password:</label>{{ form.password }}</p>
 {% if next %}
 <input type="hidden" name="next" value="{{next}}" />
 {%else%}
-<input type="hidden" name="next" value="/" />
+<input type="hidden" name="next" value="/footballseason/" />
 {% endif %}
 <input type="submit" value="login" />
 </form>

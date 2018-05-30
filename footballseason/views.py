@@ -1,7 +1,7 @@
 import logging
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -91,7 +91,7 @@ def display(request, season_id, week_id):
                 'season_choice': season_choice}
     return render(request, 'footballseason/display.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url=reverse_lazy('login'))
 def submit(request, season_id, week_id):
     season_id = int(season_id)
     week_id = int(week_id)
