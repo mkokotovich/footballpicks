@@ -49,6 +49,7 @@ class Home extends Component {
                     season={this.state.season}
                     week={week}
                     showPicks={this.state.showPicks}
+                    allowScores={this.props.currentWeek === week.toString() && this.props.currentSeason === this.state.season}
                     handleShowPicks = {this.handleShowPicks} 
                     signedInUser = {this.props.signedInUser} />
                 </TabPane>)}
@@ -66,7 +67,7 @@ class Home extends Component {
               onChange={this.handleChange}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
-              { seasons.map((season, i) => <Option value={season} key={season}>{season}</Option> )}
+              { seasons.map((season, i) => <Option value={season.toString()} key={season}>{season}</Option> )}
             </Select>
           </Col>
         </Row>

@@ -20,6 +20,7 @@ class GameList extends Component {
   constructor(props) {
     super(props);
     this.handleShowHidePicks = this.handleShowHidePicks.bind(this);
+    this.handleShowHideScores = this.handleShowHideScores.bind(this);
     this.handleEnterSubmit = this.handleEnterSubmit.bind(this);
     this.handleCancelPicks = this.handleCancelPicks.bind(this);
     this.handleSetPick = this.handleSetPick.bind(this);
@@ -27,8 +28,10 @@ class GameList extends Component {
       games: [],
       picksToSubmit: [],
       showPicks: (props.showPicks === undefined) ? false : props.showPicks,
+      showScores: (props.showScores === undefined) ? false : props.showScores,
       submitting: false,
-      loading: false
+      loading: false,
+      scoresAvailable: false
     };
   }
 
@@ -66,14 +69,20 @@ class GameList extends Component {
     }
   }
 
+  handleShowHideScores() {
+    const newShowScores = !this.state.showScores;
+    this.setState({showScores: newShowScores});
+  }
+
   handleEnterSubmit() {
     const submitting = this.state.submitting;
 
     if (submitting) {
       this.submitPicks();
     } else {
-      this.setState({submitting: !submitting,
-                     showPicks: submitting});
+      this.setState({submitting: true,
+                     showPicks: false,
+                     showScores: false});
     }
   }
 
@@ -121,7 +130,24 @@ class GameList extends Component {
   
   render() {
     const showPicksText = this.state.showPicks ? "Hide Picks" : "Show Picks";
+    const showScoresText = this.state.showScores ? "Hide Scores" : "Show Scores";
     const enterSubmitText = this.state.submitting ? "Submit your picks" : "Enter your picks";
+    const showHideScoresButton = !this.state.scoresAvailable ? (
+      <Tooltip title="Game scores are currently not available">
+        <Button
+          className="TopRightButton"
+          disabled="true"
+          onClick={this.handleShowHideScores}>
+            {showScoresText}
+        </Button>
+      </Tooltip>
+    ) : (
+      <Button
+        className="TopRightButton"
+        onClick={this.handleShowHideScores}>
+          {showScoresText}
+      </Button>
+    );
     const enterSubmitButton = this.props.signedInUser === null ? (
       <Tooltip title="Sign in to submit picks">
         <Button
@@ -149,6 +175,9 @@ class GameList extends Component {
           <Col xs={24} sm={10}>
             <Affix>
             <div className="AlignRight">
+              { !this.state.submitting && this.props.allowScores &&
+                showHideScoresButton
+              }
               { this.state.submitting && 
                 <Button
                   className="TopRightButton"
@@ -185,7 +214,8 @@ class GameList extends Component {
                                                  selectedTeam={this.state.picksToSubmit[i]}
                                                  handleSetPick={this.handleSetPick}
                                                  submitting={this.state.submitting}
-                                                 signedInUser={this.props.signedInUser} />)}
+                                                 signedInUser={this.props.signedInUser}
+                                                 showScores={this.state.showScores} />)}
       </div>
     );
   }
@@ -206,6 +236,9 @@ class GameList extends Component {
         this.setState({ "games": games });
         this.setState({ "picksToSubmit": Array(this.state.games.length).fill(null) });
         this.loadInitialPicksForUser();
+        if (this.props.allowScores) {
+          this.retrieveScores();
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -218,15 +251,37 @@ class GameList extends Component {
       });
   }
 
+  retrieveScores() {
+    axios.get('/api/v1/games/scores/')
+      .then((response) => {
+        const scores = response.data;
+        const games = this.state.games.map((game, i) => {
+          const score = scores.find(score => score.game_id === game.id);
+          if (score !== undefined) {
+            if (!this.state.scoresAvailable) {
+              this.setState({"scoresAvailable": true});
+            }
+            game.score = score;
+          }
+
+          return game
+        });
+        this.setState({"games": games});
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({
+          "scoresAvailable": false
+        });
+      });
+  }
+
   componentDidMount() {
     this.retrieveGames();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.season !== this.props.season) {
-      this.retrieveGames();
-    }
-    if (prevProps.week !== this.props.week) {
+    if (prevProps.season !== this.props.season || prevProps.week !== this.props.week) {
       this.retrieveGames();
     }
   }
