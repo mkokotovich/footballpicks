@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'antd';
 import axios from 'axios';
+import decode from 'jwt-decode';
 
 import SignInForm from './SignInForm'
 
@@ -29,7 +30,14 @@ class SignIn extends React.Component {
     // Check if token exists and isn't expired
     const token = localStorage.getItem('id_token');
     if (token) {
-      this.signInWithToken(token);
+      const decoded = decode(token);
+      const current_time = new Date().getTime() / 1000;
+      if (decoded.exp && decoded.exp < current_time) {
+	/* Token is expired, sign out */
+	this.handleSignOut();
+      } else {
+	this.signInWithToken(token);
+      }
     }
     const user = localStorage.getItem('user');
     if (user) {
