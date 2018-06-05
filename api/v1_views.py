@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 
 from footballseason.models import Game, Team, Pick, Record
 from api.serializers import GameSerializer, TeamSerializer, PickSerializer, RecordSerializer
@@ -33,7 +34,11 @@ class GameViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def scores(self, request):
-        scores = espn_api_v3.get_scores(espn_api_v3.NFL)
+        try:
+            scores = espn_api_v3.get_scores(espn_api_v3.NFL)
+        except Exception:
+            LOG.exception("Unable to retrieve scores")
+            raise APIException("Unable to retrieve scores")
         # Mock scores
         # scores = {index: ['home', '0', 'away', '7', '0:15 in 4th'] for index in range(0, 16)}
 
