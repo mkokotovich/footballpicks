@@ -27,7 +27,7 @@ services:
     depends_on:
       - django
   db:
-    image: postgres:9.6.2-alpine
+    image: postgres:9.6-alpine
     volumes:
       - ./docker/db/:/fbpicks_db
     environment:
