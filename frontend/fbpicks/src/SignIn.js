@@ -8,11 +8,14 @@ import SignInForm from './SignInForm'
 
 function SignOut(props) {
   return (
-    <Button 
-      type="primary"
-      onClick={props.handleSignOut}>
-      Sign Out
-    </Button>
+    <React.Fragment>
+      <b> {props.username} </b>
+      <Button 
+        type="primary"
+        onClick={props.handleSignOut}>
+          Sign Out
+      </Button>
+    </React.Fragment>
   );
 }
 
@@ -22,7 +25,8 @@ class SignIn extends React.Component {
     this.handleSignIn = this.handleSignIn.bind(this);
     this.handleSignOut = this.handleSignOut.bind(this);
     this.state = {
-      isSignedIn: false
+      isSignedIn: false,
+      username: undefined
     };
   }
 
@@ -33,15 +37,17 @@ class SignIn extends React.Component {
       const decoded = decode(token);
       const current_time = new Date().getTime() / 1000;
       if (decoded.exp && decoded.exp < current_time) {
-	/* Token is expired, sign out */
-	this.handleSignOut();
+        /* Token is expired, sign out */
+        this.handleSignOut();
       } else {
-	this.signInWithToken(token);
+        this.signInWithToken(token);
       }
     }
     const user = localStorage.getItem('user');
     if (user) {
-      this.props.handleAuthChange(JSON.parse(user));
+      const user_obj = JSON.parse(user);
+      this.props.handleAuthChange(user_obj);
+      this.setState({username: user_obj.username});
     }
   }
 
@@ -64,27 +70,28 @@ class SignIn extends React.Component {
       const user = response.data.user;
       console.log(response.headers);
       if (token) {
-	console.log("Signed in " + username);
-	this.signInWithToken(token);
-	if (user) {
-	  localStorage.setItem('user', JSON.stringify(user));
-	  this.props.handleAuthChange(user);
-	}
+        console.log("Signed in " + username);
+        this.setState({username: username});
+        this.signInWithToken(token);
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          this.props.handleAuthChange(user);
+        }
       } else {
-	console.log("Failed to sign in " + username);
-	Modal.error({
-	  title: "Unable to sign in",
-	  content: "Please check username and password and try again",
-	  maskClosable: true,
-	})
+        console.log("Failed to sign in " + username);
+        Modal.error({
+          title: "Unable to sign in",
+          content: "Please check username and password and try again",
+          maskClosable: true,
+        })
       }
     })
     .catch((error) => {
       console.log(error);
       Modal.error({
-	title: "Unable to sign in",
-	content: "Please check username and password and try again",
-	maskClosable: true,
+        title: "Unable to sign in",
+        content: "Please check username and password and try again",
+        maskClosable: true,
       })
     });
   }
@@ -92,6 +99,7 @@ class SignIn extends React.Component {
   handleSignOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("user");
+    this.setState({username: undefined});
     this.props.handleAuthChange(null);
     delete axios.defaults.headers.common["Authorization"];
 
@@ -101,7 +109,7 @@ class SignIn extends React.Component {
 
   render() {
     const signInOrOut = this.state.isSignedIn ? (
-      <SignOut handleSignOut={this.handleSignOut} />
+      <SignOut handleSignOut={this.handleSignOut} username={this.state.username} />
     ) : (
       <SignInForm handleSignIn={this.handleSignIn} />
     );
