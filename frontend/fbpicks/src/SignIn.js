@@ -60,9 +60,10 @@ class SignIn extends React.Component {
   }
 
   handleSignIn(username, password) {
-    console.log("Trying to sign in " + username);
+    const usernameLower = username.toLowerCase();
+    console.log("Trying to sign in " + usernameLower);
     axios.post('/api/v1/auth/', {
-      username: username,
+      username: usernameLower,
       password: password
     })
     .then((response) => {
@@ -70,15 +71,15 @@ class SignIn extends React.Component {
       const user = response.data.user;
       console.log(response.headers);
       if (token) {
-        console.log("Signed in " + username);
-        this.setState({username: username});
+        console.log("Signed in " + usernameLower);
+        this.setState({username: usernameLower});
         this.signInWithToken(token);
         if (user) {
           localStorage.setItem('user', JSON.stringify(user));
           this.props.handleAuthChange(user);
         }
       } else {
-        console.log("Failed to sign in " + username);
+        console.log("Failed to sign in " + usernameLower);
         Modal.error({
           title: "Unable to sign in",
           content: "Please check username and password and try again",
