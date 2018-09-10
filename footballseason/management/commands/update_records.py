@@ -58,21 +58,17 @@ class Command(BaseCommand):
             html = response.read()
         soup = BeautifulSoup(html, 'html.parser')
 
-        row1=soup.find_all('tr', {"class": "row1"})
-        row2=soup.find_all('tr', {"class": "row2"})
-        all_results = row1+row2
+        all_results = soup.find_all('tr', {"class": "TableBase-bodyTr"})
         successful_updates = 0
         for row in all_results:
-            #import pdb
-            #pdb.set_trace()
             # Each row is one team's record
             entries=row.find_all('td')
             # it goes name, W, L, T
-            cbs_team_name = entries[0].a.text
+            cbs_team_name = entries[0].text.strip()
             team_name = cbs_common.cbs_team_names[cbs_team_name]
-            wins = int(entries[1].text)
-            loses = int(entries[2].text)
-            ties = int(entries[3].text)
+            wins = int(entries[1].text.strip())
+            loses = int(entries[2].text.strip())
+            ties = int(entries[3].text.strip())
 
             try:
                 team = Team.objects.get(team_name=team_name)

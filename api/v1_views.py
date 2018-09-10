@@ -50,7 +50,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
         score_list = [
             {
-                "game_id": self.find_game_id(games=games, home_team=score[0], away_team=score[2]),
+                "game_id": self.find_game_id(games=games, home_team=score[2], away_team=score[0]),
                 "away_score": score[1],
                 "home_score": score[3],
                 "time": score[4],
