@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Affix, Button, Modal, Spin, Col, Row, Tooltip } from 'antd';
+import { withRouter } from 'react-router-dom';
 
 import './GameList.css';
 
@@ -33,6 +34,16 @@ class GameList extends Component {
       loading: false,
       scoresAvailable: false
     };
+  }
+
+  componentDidMount() {
+      this.retrieveGames();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.season !== this.props.season || prevProps.week !== this.props.week) {
+      this.retrieveGames();
+    }
   }
 
   handleSetPick(gameIndex, teamID) {
@@ -170,7 +181,7 @@ class GameList extends Component {
       <div className="GameList">
         <Row type="flex" style={{ marginBottom: "15px"}} align="bottom">
           <Col xs={24} sm={14}>
-            {GameListWeekMessage(this.props)}
+            {GameListWeekMessage({week: this.props.week, season: this.props.season})}
           </Col>
           <Col xs={24} sm={10}>
             <Affix>
@@ -275,16 +286,6 @@ class GameList extends Component {
         });
       });
   }
-
-  componentDidMount() {
-    this.retrieveGames();
-  }
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.season !== this.props.season || prevProps.week !== this.props.week) {
-      this.retrieveGames();
-    }
-  }
 }
 
 GameList.defaultProps = {
@@ -292,4 +293,4 @@ GameList.defaultProps = {
     week: '1'
   };
 
-export default GameList;
+export default withRouter(GameList);

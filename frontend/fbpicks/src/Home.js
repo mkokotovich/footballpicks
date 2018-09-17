@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { Tabs, Row, Col, Select } from 'antd';
+import { withRouter } from 'react-router-dom';
 
 import GameList from './GameList';
 
@@ -14,9 +15,14 @@ class Home extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.handleShowPicks = this.handleShowPicks.bind(this);
     this.state = {
-      season: props.currentSeason,
       showPicks: false
     };
+  }
+
+  componentDidMount() {
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
   }
 
   handleShowPicks(showPicks) {
@@ -25,7 +31,7 @@ class Home extends Component {
   }
 
   handleChange(value) {
-    this.setState({season: value});
+    this.props.history.push(`/games/${value}/${this.props.week}`);
     window.scrollTo(0, 0);
   }
 
@@ -42,17 +48,21 @@ class Home extends Component {
               ref={element => this.divRef = element}
               defaultActiveKey={this.props.currentWeek}
               tabPosition="top"
+              onChange={key => {
+                this.props.history.push(`/games/${this.props.season}/${key}`);
+              }}
             >
               {weeks.map((week, i) =>
                 <TabPane tab={"Week " + week} key={week}>
                   <GameList
-                    season={this.state.season}
+                    season={this.props.season}
                     week={week}
                     showPicks={this.state.showPicks}
-                    allowScores={this.props.currentWeek === week.toString() && this.props.currentSeason === this.state.season}
+                    allowScores={this.props.currentWeek === week.toString() && this.props.currentSeason === this.props.season}
                     handleShowPicks = {this.handleShowPicks} 
                     signedInUser = {this.props.signedInUser} />
-                </TabPane>)}
+                </TabPane>
+              )}
             </Tabs>
           </Col>
         </Row>
@@ -62,7 +72,7 @@ class Home extends Component {
             Select a different season to view past results: &nbsp;
             <Select
               showSearch
-              defaultValue={ this.props.currentSeason }
+              defaultValue={ this.props.season }
               optionFilterProp="children"
               onChange={this.handleChange}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
@@ -76,4 +86,4 @@ class Home extends Component {
   }
 }
 
-export default Home
+export default withRouter(Home);
