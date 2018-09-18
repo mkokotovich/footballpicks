@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Select, Table, Divider, Tag, Affix, Radio, Modal, Spin, Col, Row, Tooltip } from 'antd';
+import { Select, Table, Radio, Modal, Spin, Col, Row } from 'antd';
 import { withRouter } from 'react-router-dom';
 
 import './Records.css';
@@ -149,34 +149,38 @@ class Records extends Component {
       <div className="Records">
         <Row type="flex" gutter={20} align="middle">
         <Col>
-        <Radio.Group onChange={this.onChange} value={this.state.radioValue} buttonStyle="solid">
-          <Radio.Button value="week">Week</Radio.Button>
-          <Radio.Button value="season">Season</Radio.Button>
-          <Radio.Button value="alltime">All Time</Radio.Button>
-        </Radio.Group>
+          <Radio.Group onChange={this.onChange} value={this.state.radioValue} buttonStyle="solid">
+            <Radio.Button value="week">Week</Radio.Button>
+            <Radio.Button value="season">Season</Radio.Button>
+            <Radio.Button value="alltime">All Time</Radio.Button>
+          </Radio.Group>
         </Col>
         
-
-        <Col>
-        { this.state.radioValue === "week" ? (
-          <div>
-            Select Week: { weekSelector }
-          </div>
-          ) : '' }
-        </Col>
-        <Col>
-        { (this.state.radioValue === "season" || this.state.radioValue === "week") ? (
-          <div>
-            Select Season: { seasonSelector }
-          </div>
-          )
-        : '' }
-        </Col>
+        { (this.state.radioValue === "season" || this.state.radioValue === "week") && (
+          <Col>
+            <div>
+              Select Season: { seasonSelector }
+            </div>
+          </Col>
+        )}
+        { this.state.radioValue === "week" && (
+          <Col>
+            <div>
+              Select Week: { weekSelector }
+            </div>
+          </Col>
+        )}
         </Row>
 
         <br/> <br/>
 
         <Table columns={this.columns} dataSource={this.state.records} />
+
+        <Row type="flex" justify="center">
+          <Col>
+            { this.state.loading && <Spin size="large" /> }
+          </Col>
+        </Row>
 
       </div>
     );

@@ -32,6 +32,7 @@ class GameList extends Component {
       showScores: (props.showScores === undefined) ? false : props.showScores,
       submitting: false,
       loading: false,
+      refreshing: false,
       scoresAvailable: false
     };
   }
@@ -143,6 +144,16 @@ class GameList extends Component {
     const showPicksText = this.state.showPicks ? "Hide Picks" : "Show Picks";
     const showScoresText = this.state.showScores ? "Hide Scores" : "Show Scores";
     const enterSubmitText = this.state.submitting ? "Submit your picks" : "Enter your picks";
+    const refreshScoresButton = (
+      <Button
+        className="TopRightButton"
+        onClick = {() => {
+          this.setState({refreshing: true});
+          this.retrieveScores()
+        }} >
+          Refresh scores
+      </Button>
+    );
     const showHideScoresButton = !this.state.scoresAvailable ? (
       <Tooltip title="Game scores are currently not available">
         <Button
@@ -186,6 +197,9 @@ class GameList extends Component {
           <Col xs={24} sm={10}>
             <Affix>
             <div className="AlignRight">
+              { this.state.showScores &&
+                refreshScoresButton
+              }
               { !this.state.submitting && this.props.allowScores &&
                 showHideScoresButton
               }
@@ -215,7 +229,7 @@ class GameList extends Component {
         </Row>
         <Row type="flex" justify="center">
           <Col>
-            { this.state.loading && <Spin size="large" /> }
+            { (this.state.loading || this.state.refreshing) && <Spin size="large" /> }
           </Col>
         </Row>
         {this.state.games.map((game, i) => <Game game={game}
@@ -265,6 +279,7 @@ class GameList extends Component {
   retrieveScores() {
     axios.get('/api/v1/games/scores/')
       .then((response) => {
+        this.setState({refreshing: false});
         const scores = response.data;
         const games = this.state.games.map((game, i) => {
           const score = scores.find(score => score.game_id === game.id);
@@ -281,6 +296,7 @@ class GameList extends Component {
       })
       .catch((error) => {
         console.log(error);
+        this.setState({refreshing: false});
         this.setState({
           "scoresAvailable": false
         });
