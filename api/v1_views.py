@@ -1,10 +1,14 @@
 import logging
 
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
+from django.utils import timezone
+from django.db.models import Sum
+from django.contrib.auth.models import User
 
 from footballseason.models import Game, Team, Pick, Record
 from api.serializers import GameSerializer, TeamSerializer, PickSerializer, RecordSerializer
@@ -29,7 +33,7 @@ class GameViewSet(viewsets.ModelViewSet):
         for game in games:
             if away_team in game.away_team.team_name and home_team in game.home_team.team_name:
                 return game.id
-        LOG.error(f"No game found for {away_team} vs {home_team}")
+        LOG.warning(f"No game found for {away_team} vs {home_team}")
         return 0
 
     @action(detail=False)
@@ -87,10 +91,70 @@ class PickViewSet(viewsets.ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
-class RecordViewSet(viewsets.ModelViewSet):
-    queryset = Record.objects.all()
-    serializer_class = RecordSerializer
-    pagination_class = APIPagination
-    filter_fields = ('user_name', 'season', 'week')
-    ordering = "-id"
+class RecordsView(APIView):
     permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+        season_id = request.query_params.get('season', None)
+        week_id = request.query_params.get('week', None)
+
+        game_season = season_id
+        if (season_id == 2015):
+            # 2015 games didnt have a season populated
+            game_season = 0
+
+        aggregate_list = []
+        all_users = User.objects.all()
+        current_time = timezone.now()
+
+        for each_user in User.objects.all():
+            if (each_user.username == 'admin'):
+                continue
+
+            # First find the number of wins from the Record table
+            query = Record.objects.filter(user_name=each_user.first_name)
+
+            # Then filter by season and week, if necessary
+            if season_id:
+                query = query.filter(season=season_id)
+            if week_id:
+                query = query.filter(week=week_id)
+
+            # Finally, find the sum of all the wins in each record
+            win_sum = sum([i.wins for i in query])
+
+            # Next find the total number of games from the Pick table
+            query = Pick.objects.filter(game__game_time__lte=current_time, user_name=each_user.first_name)
+
+            # Then filter by season and week, if necessary
+            if season_id:
+                query = query.filter(game__season=game_season)
+            if week_id:
+                query = query.filter(game__week=week_id)
+
+            total_games = query.count()
+            if (total_games == 0):
+                continue
+
+            percentage = win_sum / total_games
+            aggregate_list.append((each_user.first_name, win_sum, total_games - win_sum, percentage))
+
+        totals = []
+        if week_id:
+            # Sort by win
+            totals = sorted(aggregate_list, key=lambda record: record[1], reverse=True)
+        else:
+            # Sort by percentage
+            totals = sorted(aggregate_list, key=lambda record: record[3], reverse=True)
+
+        results = [{
+            'name': record[0],
+            'win': record[1],
+            'loss': record[2],
+            'percentage': record[3],
+        } for record in totals]
+        data = {
+            'results': results,
+        }
+
+        return Response(data)

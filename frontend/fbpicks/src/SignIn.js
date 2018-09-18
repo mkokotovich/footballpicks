@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'antd';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import decode from 'jwt-decode';
 
@@ -7,9 +8,14 @@ import SignInForm from './SignInForm'
 
 
 function SignOut(props) {
+  const username = props.username === "matt" ? (
+    <Link to="/records">{props.username}</Link>
+  ) : (
+    props.username
+  );
   return (
     <React.Fragment>
-      <b> {props.username} </b>
+      <b> {username} </b>
       <Button 
         type="primary"
         onClick={props.handleSignOut}>

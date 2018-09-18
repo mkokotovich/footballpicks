@@ -4,6 +4,7 @@ import { Row, Col } from 'antd';
 
 import SignIn from './SignIn';
 import Home from './Home';
+import Records from './Records';
 
 import './App.css';
 
@@ -74,7 +75,7 @@ class App extends Component {
           className="navbar"
           align="middle"
           >
-          <Col className="Logo"><Link to="/">Football Picks</Link></Col>
+          <Col className="Logo"><Link to="/" style={{ textDecoration: "none", color: '#663300' }}>Football Picks</Link></Col>
           <Col><SignIn handleAuthChange={this.handleAuthChange} /></Col>
         </Row>
         <Route
@@ -82,6 +83,13 @@ class App extends Component {
           path="/"
           render={() => {
             return <Redirect to={`/games/${currentSeason}/${currentWeek}`}/>
+          }}
+        />
+        <Route
+          exact
+          path="/records"
+          render={() => {
+            return <Records currentSeason={this.getCurrentSeason().toString()} currentWeek={this.getCurrentWeek().toString()} signedInUser={this.state.user} />;
           }}
         />
         <Route
