@@ -1,26 +1,36 @@
 import React from 'react';
-import { Modal, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import { Dropdown, Menu, Modal, Button } from 'antd';
+import { withRouter } from 'react-router-dom';
 import axios from 'axios';
 import decode from 'jwt-decode';
 
 import SignInForm from './SignInForm'
 
-
 function SignOut(props) {
-  const username = props.username === "matt" ? (
-    <Link to="/records">{props.username}</Link>
-  ) : (
-    props.username
+  const menuClick = ({ key }) => {
+    if (key === "signout") {
+      props.handleSignOut();
+    } else if (key === "records") {
+      props.history.push('/records');
+    }
+  };
+
+  const menu = (
+    <Menu onClick={menuClick}>
+      { props.username === "matt" && (
+        <Menu.Item key="records">Records</Menu.Item>
+      )}
+      <Menu.Item key="signout">Sign Out</Menu.Item>
+    </Menu>
   );
+
   return (
     <React.Fragment>
-      <b> {username} </b>
-      <Button 
-        type="primary"
-        onClick={props.handleSignOut}>
-          Sign Out
-      </Button>
+      <Dropdown overlay={menu} placement="bottomRight">
+        <Button type="default" icon="user">
+          {props.username}
+        </Button>
+      </Dropdown>
     </React.Fragment>
   );
 }
@@ -116,7 +126,7 @@ class SignIn extends React.Component {
 
   render() {
     const signInOrOut = this.state.isSignedIn ? (
-      <SignOut handleSignOut={this.handleSignOut} username={this.state.username} />
+      <SignOut handleSignOut={this.handleSignOut} username={this.state.username} history={this.props.history} />
     ) : (
       <SignInForm handleSignIn={this.handleSignIn} />
     );
@@ -129,4 +139,4 @@ class SignIn extends React.Component {
   }
 }
 
-export default SignIn
+export default withRouter(SignIn)
