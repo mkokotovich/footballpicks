@@ -7,11 +7,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import APIException
 from django.utils import timezone
-from django.db.models import Sum
 from django.contrib.auth.models import User
 
 from footballseason.models import Game, Team, Pick, Record
-from api.serializers import GameSerializer, TeamSerializer, PickSerializer, RecordSerializer
+from api.serializers import GameSerializer, TeamSerializer, PickSerializer
 from api.pagination import APIPagination
 from api.permissions import IsAdminUserOrReadOnly
 import footballseason.fb_utils as utils
@@ -99,7 +98,6 @@ class RecordsView(APIView):
         week_id = request.query_params.get('week', None)
 
         aggregate_list = []
-        all_users = User.objects.all()
         current_time = timezone.now()
 
         for each_user in User.objects.all():
