@@ -34,18 +34,17 @@ class Game(models.Model):
         try:
             # Season 2015 was different
             if (self.season == 2015):
-                #Week two was entered manually and has to be treated differently
+                # Week two was entered manually and has to be treated differently
                 if (self.week <= 2):
-                    gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 
+                    gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p")
                 else:
-                    gametimestr = self.game_time.strftime("%b %d, %I:%M %p") 
+                    gametimestr = self.game_time.strftime("%b %d, %I:%M %p")
             # All other seasons were entered as UTC time
             else:
                 # Defaulting to central for now
                 central_tz = pytz.timezone("America/Chicago")
                 gametime_central = central_tz.normalize(self.game_time.astimezone(central_tz))
-                gametimestr = gametime_central.strftime("%b %d, %I:%M %p") 
-
+                gametimestr = gametime_central.strftime("%b %d, %I:%M %p")
 
         except NameError:
             gametimestr = ""

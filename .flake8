@@ -1,0 +1,18 @@
+[flake8]
+max-line-length = 160
+ignore =
+    # H306: imports not in alphabetical order (time, os)
+    H306,
+exclude =
+    .git,
+    __pycache__,
+    migrations,
+    espn_api,
+    footballseason/templatetags,
+    footballseason/views.py,
+    footballseason/admin.py,
+    footballseason/forms.py,
+    footballseason/views.py,
+    footballseason/test_models.py,
+    footballseason/fb_utils.py,
+    footballseason/urls.py,

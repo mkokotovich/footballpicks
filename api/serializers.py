@@ -1,8 +1,9 @@
 import logging
 
 from rest_framework import serializers
-from footballseason.models import Game, Team, Pick, Record
 from django.contrib.auth.models import User
+
+from footballseason.models import Game, Team, Pick
 
 
 LOG = logging.getLogger(__name__)
@@ -22,6 +23,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class PickSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+
     class Meta:
         model = Pick
         fields = '__all__'
@@ -46,6 +48,7 @@ class PickSerializer(serializers.ModelSerializer):
 
 class PickDisplaySerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+
     class Meta:
         model = Pick
         fields = ('user', 'team_to_win')

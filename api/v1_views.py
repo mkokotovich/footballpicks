@@ -100,54 +100,50 @@ class RecordsView(APIView):
         aggregate_list = []
         current_time = timezone.now()
 
-        for each_user in User.objects.all():
-            if (each_user.username == 'admin'):
+        for user in User.objects.all():
+            if (user.username == 'admin'):
                 continue
 
             # First find the number of wins from the Record table
-            query = Record.objects.filter(user=each_user)
+            wins_query = Record.objects.filter(user=user)
 
             # Then filter by season and week, if necessary
             if season_id:
-                query = query.filter(season=season_id)
+                wins_query = wins_query.filter(season=season_id)
             if week_id:
-                query = query.filter(week=week_id)
+                wins_query = wins_query.filter(week=week_id)
 
             # Finally, find the sum of all the wins in each record
-            win_sum = sum([i.wins for i in query])
+            win_sum = sum([i.wins for i in wins_query])
 
             # Next find the total number of games from the Pick table
-            query = Pick.objects.filter(game__game_time__lte=current_time, user=each_user)
+            total_query = Pick.objects.filter(game__game_time__lte=current_time, user=user)
 
             # Then filter by season and week, if necessary
             if season_id:
-                query = query.filter(game__season=season_id)
+                total_query = total_query.filter(game__season=season_id)
             if week_id:
-                query = query.filter(game__week=week_id)
+                total_query = total_query.filter(game__week=week_id)
 
-            total_games = query.count()
+            total_games = total_query.count()
             if (total_games == 0):
                 continue
 
             percentage = win_sum / total_games
-            aggregate_list.append((each_user.first_name, win_sum, total_games - win_sum, percentage))
+            aggregate_list.append({
+                'name': user.first_name,
+                'win': win_sum,
+                'loss': total_games,
+                'percentage': percentage,
+            })
 
-        totals = []
         if week_id:
-            # Sort by win
-            totals = sorted(aggregate_list, key=lambda record: record[1], reverse=True)
+            totals = sorted(aggregate_list, key=lambda record: record['win'], reverse=True)
         else:
-            # Sort by percentage
-            totals = sorted(aggregate_list, key=lambda record: record[3], reverse=True)
+            totals = sorted(aggregate_list, key=lambda record: record['percentage'], reverse=True)
 
-        results = [{
-            'name': record[0],
-            'win': record[1],
-            'loss': record[2],
-            'percentage': record[3],
-        } for record in totals]
         data = {
-            'results': results,
+            'results': totals,
         }
 
         return Response(data)
