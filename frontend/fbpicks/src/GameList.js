@@ -247,11 +247,9 @@ class GameList extends Component {
 
   retrieveGames() {
     this.setState({loading: true});
-    /* Special workaround for funny DB entries for season 2015 */
-    const season = this.props.season === 2015 ? 0 : this.props.season;
     axios.get('/api/v1/games/', {
         params: {
-          season: season,
+          season: this.props.season,
           week: this.props.week,
         }
       })

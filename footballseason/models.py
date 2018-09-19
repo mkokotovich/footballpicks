@@ -33,7 +33,7 @@ class Game(models.Model):
     def gametime(self):
         try:
             # Season 2015 was different
-            if (self.season == 0):
+            if (self.season == 2015):
                 #Week two was entered manually and has to be treated differently
                 if (self.week <= 2):
                     gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p") 

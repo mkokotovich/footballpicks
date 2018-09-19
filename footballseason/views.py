@@ -78,13 +78,9 @@ def display(request, season_id, week_id):
     if (season_id == 0):
         season_id = utils.get_season()
     season_choice = SeasonChoice(initial={'season':season_id})
-    filter_season_id = season_id
-    if (season_id == 2015):
-        #First season (2015) didn't have season populated, it is stored as 0
-        filter_season_id = 0
     if (week_id == 0):
         week_id = utils.get_week()
-    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
+    games_list = Game.objects.order_by('game_time').filter(season=season_id, week=week_id)
     context = { 'games_list': games_list ,
                 'season_id': season_id,
                 'week_id': week_id,
@@ -102,13 +98,9 @@ def submit(request, season_id, week_id):
     if (season_id == 0):
         season_id = utils.get_season()
     season_choice = SeasonChoice(initial={'season':season_id})
-    filter_season_id = season_id
-    if (season_id == 2015):
-        #First season (2015) didn't have season populated, it is stored as 0
-        filter_season_id = 0
     if (week_id == 0):
         week_id = utils.get_week()
-    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
+    games_list = Game.objects.order_by('game_time').filter(season=season_id, week=week_id)
     game_and_pick_list = []
     for game in games_list:
         side = ''
@@ -140,11 +132,7 @@ def pick_is_after_gametime(gametime, date_submitted):
 def vote(request, season_id, week_id):
     season_id = int(season_id)
     week_id = int(week_id)
-    filter_season_id = season_id
-    if (season_id == 2015):
-        #First season (2015) didn't have season populated, it is stored as 0
-        filter_season_id = 0
-    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
+    games_list = Game.objects.order_by('game_time').filter(season=season_id, week=week_id)
     date_submitted = timezone.now()
     successful_submissions = 0
     for index, game in enumerate(games_list):
@@ -280,11 +268,6 @@ def records(request, season_id=0, week=0, view="week", month=0):
                    'season_choice': season_choice}
         return render(request, 'footballseason/records.html', context)
 
-    game_season = season_id
-    if (season_id == 2015):
-        # 2015 games didnt have a season populated
-        game_season = 0
-
     aggregate_list = [] 
     all_users = User.objects.all()
     current_time = timezone.now()
@@ -305,7 +288,7 @@ def records(request, season_id=0, week=0, view="week", month=0):
         query = Pick.objects.filter(game__game_time__lte=current_time, user=each_user)
         # If we aren't doing an all-time view, filter by the current season
         if view != "alltime":
-            query = query.filter(game__season=game_season)
+            query = query.filter(game__season=season_id)
         # If month view, filter by the weeks in that month
         if view == "month":
             query = query.filter(game__game_time__month=month_id)
@@ -334,12 +317,8 @@ def records(request, season_id=0, week=0, view="week", month=0):
 
 def live(request):
     season_id = utils.get_season()
-    filter_season_id = season_id
-    if (season_id == 2015):
-        #First season (2015) didn't have season populated, it is stored as 0
-        filter_season_id = 0
     week_id = utils.get_week()
-    games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
+    games_list = Game.objects.order_by('game_time').filter(season=season_id, week=week_id)
     scores = espn_api_v3.get_scores(espn_api_v3.NFL)
     live_list = []
     # sort the scores in the order of our games

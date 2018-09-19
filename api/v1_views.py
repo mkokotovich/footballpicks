@@ -98,11 +98,6 @@ class RecordsView(APIView):
         season_id = request.query_params.get('season', None)
         week_id = request.query_params.get('week', None)
 
-        game_season = season_id
-        if (season_id == 2015):
-            # 2015 games didnt have a season populated
-            game_season = 0
-
         aggregate_list = []
         all_users = User.objects.all()
         current_time = timezone.now()
@@ -128,7 +123,7 @@ class RecordsView(APIView):
 
             # Then filter by season and week, if necessary
             if season_id:
-                query = query.filter(game__season=game_season)
+                query = query.filter(game__season=season_id)
             if week_id:
                 query = query.filter(game__week=week_id)
 
