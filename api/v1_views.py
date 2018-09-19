@@ -76,7 +76,7 @@ class PickViewSet(viewsets.ModelViewSet):
     queryset = Pick.objects.all()
     serializer_class = PickSerializer
     pagination_class = APIPagination
-    filter_fields = ('user_name', 'game', 'team_to_win')
+    filter_fields = ('user', 'game', 'team_to_win')
     ordering = "-id"
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -112,7 +112,7 @@ class RecordsView(APIView):
                 continue
 
             # First find the number of wins from the Record table
-            query = Record.objects.filter(user_name=each_user.first_name)
+            query = Record.objects.filter(user=each_user)
 
             # Then filter by season and week, if necessary
             if season_id:
@@ -124,7 +124,7 @@ class RecordsView(APIView):
             win_sum = sum([i.wins for i in query])
 
             # Next find the total number of games from the Pick table
-            query = Pick.objects.filter(game__game_time__lte=current_time, user_name=each_user.first_name)
+            query = Pick.objects.filter(game__game_time__lte=current_time, user=each_user)
 
             # Then filter by season and week, if necessary
             if season_id:

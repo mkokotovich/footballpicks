@@ -59,7 +59,7 @@ class GameList extends Component {
     }
     const picksToSubmit = this.state.games.map((game, i) => {
       const user_pick = game.picks.filter((pick) => {
-        if (pick.user_name === this.props.signedInUser.first_name) {
+        if (pick.user.id === this.props.signedInUser.id) {
           return true;
         }
         return false;

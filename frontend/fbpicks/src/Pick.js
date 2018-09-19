@@ -6,7 +6,7 @@ function Pick(props) {
   return (
     <span className="Pick">
       { props.home !== true && <span> &nbsp;</span> }
-      { props.pick.user_name }
+      { props.pick.user.first_name }
       { props.home === true && <span> &nbsp;</span> }
     </span>
   );

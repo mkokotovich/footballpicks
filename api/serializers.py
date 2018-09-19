@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name')
+        fields = ('id', 'username', 'first_name', 'last_name')
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -21,16 +21,17 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class PickSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     class Meta:
         model = Pick
         fields = '__all__'
-        read_only_fields = ('date_submitted', 'user_name')
+        read_only_fields = ('date_submitted', 'user')
 
     def create(self, validated_data):
         LOG.info(self.context['request'].user)
-        user_name = self.context['request'].user.first_name
+        user = self.context['request'].user
         pick, created = Pick.objects.get_or_create(
-            user_name=user_name,
+            user=user,
             game=validated_data['game'],
             defaults={
                 'team_to_win': validated_data['team_to_win'],
@@ -44,9 +45,10 @@ class PickSerializer(serializers.ModelSerializer):
 
 
 class PickDisplaySerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     class Meta:
         model = Pick
-        fields = ('user_name', 'team_to_win')
+        fields = ('user', 'team_to_win')
 
 
 class GameSerializer(serializers.ModelSerializer):
@@ -60,6 +62,7 @@ class GameSerializer(serializers.ModelSerializer):
 
 
 class RecordSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     class Meta:
         model = Record
         fields = '__all__'

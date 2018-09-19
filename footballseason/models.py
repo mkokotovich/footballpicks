@@ -1,6 +1,10 @@
-from django.db import models
 from datetime import timezone
+
+from django.contrib.auth.models import User
+from django.db import models
+
 import pytz
+
 
 class Team(models.Model):
     team_name = models.CharField(max_length=200)
@@ -17,6 +21,7 @@ class Team(models.Model):
 
     def __str__(self):
         return self.team_name
+
 
 class Game(models.Model):
     season = models.IntegerField(default=0)
@@ -49,20 +54,22 @@ class Game(models.Model):
     def __str__(self):
         return "Week %d: %s at %s" % (self.week, self.away_team, self.home_team)
 
+
 class Pick(models.Model):
-    user_name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     game = models.ForeignKey(Game, related_name='picks', on_delete=models.PROTECT)
     team_to_win = models.ForeignKey(Team, on_delete=models.PROTECT)
     date_submitted = models.DateTimeField('Date pick was submitted', auto_now_add=True)
 
     def __str__(self):
-        return "%s picks %s to win" % (self.user_name, self.team_to_win)
+        return "%s picks %s to win" % (self.user.first_name, self.team_to_win)
+
 
 class Record(models.Model):
-    user_name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
     season = models.IntegerField(default=0)
     week = models.IntegerField(default=0)
     wins = models.IntegerField(default=0)
 
     def __str__(self):
-        return "%s has %d wins in week %d of the %d season" % (self.user_name, self.wins, self.week, self.season)
+        return "%s has %d wins in week %d of the %d season" % (self.user.first_name, self.wins, self.week, self.season)

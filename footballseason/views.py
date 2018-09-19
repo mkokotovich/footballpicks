@@ -44,9 +44,9 @@ def update_records(team):
     winning_picks = last_game.picks.filter(team_to_win=team)
     for pick in winning_picks:
         try:
-            record = Record.objects.get(user_name=pick.user_name, season=utils.get_season(), week=last_game_week)
+            record = Record.objects.get(user=pick.user, season=utils.get_season(), week=last_game_week)
         except:
-            record = Record(user_name=pick.user_name, season=utils.get_season(), week=last_game_week, wins=0);
+            record = Record(user=pick.user, season=utils.get_season(), week=last_game_week, wins=0);
         record.wins += 1
         record.save()
 
@@ -113,7 +113,7 @@ def submit(request, season_id, week_id):
     for game in games_list:
         side = ''
         try:
-            pick = game.picks.get(user_name=request.user.first_name)
+            pick = game.picks.get(user=request.user)
             if (pick.team_to_win == game.home_team):
                 side = 'home'
             elif (pick.team_to_win == game.away_team):
@@ -145,7 +145,6 @@ def vote(request, season_id, week_id):
         #First season (2015) didn't have season populated, it is stored as 0
         filter_season_id = 0
     games_list = Game.objects.order_by('game_time').filter(season=filter_season_id, week=week_id)
-    name=request.user.first_name
     date_submitted = timezone.now()
     successful_submissions = 0
     for index, game in enumerate(games_list):
@@ -176,13 +175,13 @@ def vote(request, season_id, week_id):
 
             # A team was selected, first look to see if a pick already exists
             try:
-                pick = game.picks.get(user_name=name)
+                pick = game.picks.get(user=request.user)
                 # An existing pick was found, update selection
                 pick.team_to_win=team_selected
                 pick.date_submitted=date_submitted
             except ObjectDoesNotExist:
                 # No existing pick found, create new pick
-                pick = Pick(user_name=name, game=game, team_to_win=team_selected, date_submitted=date_submitted)
+                pick = Pick(user=request.user, game=game, team_to_win=team_selected, date_submitted=date_submitted)
 
             pick.save()
             successful_submissions += 1
@@ -293,7 +292,7 @@ def records(request, season_id=0, week=0, view="week", month=0):
         if (each_user.username == 'admin'):
             continue
         # First find the number of wins from the Record table
-        query = Record.objects.filter(user_name=each_user.first_name)
+        query = Record.objects.filter(user=each_user)
         # If we aren't doing an all-time view, filter by the current season
         if view != "alltime":
             query = query.filter(season=season_id)
@@ -303,7 +302,7 @@ def records(request, season_id=0, week=0, view="week", month=0):
             query = query.filter(week__gte=first_week, week__lte=last_week)
         win_sum = sum([i.wins for i in query])
         # Then find the total number of games from the Pick table
-        query = Pick.objects.filter(game__game_time__lte=current_time, user_name=each_user.first_name)
+        query = Pick.objects.filter(game__game_time__lte=current_time, user=each_user)
         # If we aren't doing an all-time view, filter by the current season
         if view != "alltime":
             query = query.filter(game__season=game_season)

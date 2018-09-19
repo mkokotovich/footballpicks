@@ -43,11 +43,11 @@ class Command(BaseCommand):
         winning_picks = last_game.picks.filter(team_to_win=team)
         for pick in winning_picks:
             try:
-                record = Record.objects.get(user_name=pick.user_name, season=fb_utils.get_season(), week=last_game_week)
+                record = Record.objects.get(user=pick.user, season=fb_utils.get_season(), week=last_game_week)
             except:
-                record = Record(user_name=pick.user_name, season=fb_utils.get_season(), week=last_game_week, wins=0);
+                record = Record(user=pick.user, season=fb_utils.get_season(), week=last_game_week, wins=0);
             record.wins += 1
-            LOG.info(f"Adding a win to {pick.user_name} for picking {team}")
+            LOG.info(f"Adding a win to {pick.user.first_name} for picking {team}")
             record.save()
 
 
