@@ -1,14 +1,12 @@
 # From: http://espn.go.com/nfl/schedule
 import logging
 import sys
-from datetime import datetime
+import datetime
 import urllib.request
 
-from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
 from bs4 import BeautifulSoup
-import pytz
 
 from footballseason.models import Game, Team
 from footballseason import fb_utils
@@ -42,12 +40,11 @@ class Command(BaseCommand):
                     # bye teams
                     continue
                 game_time = game_time_data['data-date']
-                #  2016-12-16T01:25Z
-                game_datetime = datetime.strptime(game_time, "%Y-%m-%dT%H:%MZ")
-                game_tzaware = pytz.utc.localize(game_datetime)
-                current_tz = timezone.get_current_timezone()
-                local_gametime = current_tz.normalize(game_tzaware.astimezone(current_tz))
-                LOG.info(timezone.is_aware(local_gametime))
+                # 2016-12-16T01:25Z
+                game_datetime = datetime.datetime.strptime(game_time, "%Y-%m-%dT%H:%MZ")
+                # Make gametime timezone aware
+                game_datetime = game_datetime.replace(tzinfo=datetime.timezone.utc)
+
                 team_names = []
                 for team_abbr in row.find_all('abbr'):
                     team_names.append(espn_common.espn_team_names[team_abbr.contents[0].lower()])
@@ -61,10 +58,10 @@ class Command(BaseCommand):
                 try:
                     obj = Game.objects.get(season=season, week=week, home_team=home, away_team=away)
                 except Game.DoesNotExist:
-                    obj = Game(season=season, week=week, home_team=home, away_team=away, game_time=game_tzaware)
+                    obj = Game(season=season, week=week, home_team=home, away_team=away, game_time=game_datetime)
                     LOG.info("Adding: {0}".format(obj))
                 else:
-                    obj.game_time = game_tzaware
+                    obj.game_time = game_datetime
                     LOG.info(f"{obj} was already on the schedule, updating gametime and saving")
                 finally:
                     obj.save()
