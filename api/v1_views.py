@@ -133,7 +133,7 @@ class RecordsView(APIView):
             aggregate_list.append({
                 'name': user.first_name,
                 'win': win_sum,
-                'loss': total_games,
+                'loss': total_games - win_sum,
                 'percentage': percentage,
             })
 
