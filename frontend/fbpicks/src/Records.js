@@ -52,11 +52,12 @@ class Records extends Component {
         });
       })
       .catch((error) => {
-        console.log(error);
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
         this.setState({loading: false});
         Modal.error({
           title: "Unable to load records",
-          content: "Unable to load records. Please try again.\n\n" + error,
+          content: "Unable to load records. Please try again.\n\n" + errorString,
           maskClosable: true,
         })
       });

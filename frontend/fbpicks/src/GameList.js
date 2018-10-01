@@ -44,6 +44,9 @@ class GameList extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.season !== this.props.season || prevProps.week !== this.props.week) {
       this.retrieveGames();
+    } else if (this.props.signedInUser &&
+      (!prevProps.signedInUser || prevProps.signedInUser.id !== this.props.signedInUser.id)) {
+      this.loadInitialPicksForUser();
     }
   }
 
@@ -115,6 +118,7 @@ class GameList extends Component {
       })
       return;
     }
+    const missingPicks = this.state.games.length - picks.length;
     this.setState({loading: true});
     axios.post('/api/v1/picks/', picks)
       .then((response) => {
@@ -123,13 +127,21 @@ class GameList extends Component {
         this.retrieveGames();
         this.setState({submitting: false,
                        showPicks: true});
+        if (missingPicks !== 0) {
+          Modal.info({
+            title: "Some games missing picks",
+            content: `${picks.length} picks submitted successfully, but ${missingPicks} games do not have picks selected`,
+            maskClosable: true,
+          });
+        }
       })
       .catch((error) => {
-        console.log(error);
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
         this.setState({loading: false});
         Modal.error({
           title: "Unable to submit picks",
-          content: "Unable to submit your picks. Please try again\n\n" + error,
+          content: "Unable to submit your picks. Please try again\n\n" + errorString,
           maskClosable: true,
         })
       });
@@ -264,11 +276,12 @@ class GameList extends Component {
         }
       })
       .catch((error) => {
-        console.log(error);
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
         this.setState({loading: false});
         Modal.error({
           title: "Unable to load games",
-          content: "Unable to load games. Please try again.\n\n" + error,
+          content: "Unable to load games. Please try again.\n\n" + errorString,
           maskClosable: true,
         })
       });
@@ -293,7 +306,8 @@ class GameList extends Component {
         this.setState({"games": games});
       })
       .catch((error) => {
-        console.log(error);
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
         this.setState({refreshing: false});
         this.setState({
           "scoresAvailable": false
