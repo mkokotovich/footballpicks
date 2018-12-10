@@ -68,8 +68,10 @@ class Command(BaseCommand):
             # Each row is one team's record
             entries=row.find_all('td')
             # it goes name, W, L, T
-            cbs_team_name = entries[0].a.text
-            team_name = cbs_common.cbs_team_names[cbs_team_name]
+            cbs_team_name_raw = entries[0].a.text
+            # Remove playoff indicators (e.g.  - x)
+            cbs_team_name_only = cbs_team_name_raw.split(' - ')[0]
+            team_name = cbs_common.cbs_team_names[cbs_team_name_only]
             wins = int(entries[1].text)
             loses = int(entries[2].text)
             ties = int(entries[3].text)
