@@ -92,7 +92,7 @@ class Team extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.checked !== this.props.checked) {
+    if (prevState.checked !== this.props.checked) {
       this.setState({checked: this.props.checked});
     }
   }

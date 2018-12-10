@@ -1,5 +1,5 @@
-.GameList {
-  padding: 0px 10px 10px 10px;
+.Records {
+  padding: 10px 10px 10px 10px;
 }
 
 .TopRightButton {
@@ -10,14 +10,10 @@
   float: right;
 }
 
-.GameListWeekMessage {
-  font-size: 2em;
-}
-
 .roundedDivider {
   height: 6px;
   width: 85%;
   border-radius: 3px;
-  background-color: #663300;
+  background-color: #8e662f;
   margin-bottom: 30px;
 }

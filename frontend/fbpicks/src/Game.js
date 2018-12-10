@@ -8,6 +8,26 @@ import PickList from './PickList';
 import './Game.css'
 
 function Game(props) {
+  const scoresText = props.game.score && (
+    Number(props.game.score.away_score) > Number(props.game.score.home_score) ? (
+    <span><b>{props.game.score.away_score}</b> - {props.game.score.home_score}</span>
+  ) : Number(props.game.score.away_score) < Number(props.game.score.home_score) ? (
+    <span>{props.game.score.away_score} - <b>{props.game.score.home_score}</b></span>
+  ) : (
+    <span>{props.game.score.away_score} - {props.game.score.home_score}</span>
+  ));
+  const scoreRow = props.game.score && (
+    <Row type="flex" justify="center" align="top" gutter={10}>
+      <Col>
+        <div className="Scores">
+          {scoresText}
+        </div>
+        <div className="ScoreTime">
+          {props.game.score.time}
+        </div>
+      </Col>
+    </Row>
+  );
   return (
     <div className="Game">
       <Row type="flex" justify="center" align="top" gutter={10}>
@@ -43,6 +63,9 @@ function Game(props) {
                     display={props.display_picks} />
         </Col>
       </Row>
+      { props.showScores &&
+        scoreRow
+      }
       <br/>
     </div>
   );

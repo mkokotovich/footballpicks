@@ -7,9 +7,9 @@ class TeamAdmin(admin.ModelAdmin):
 class GameAdmin(admin.ModelAdmin):
     fields = ['season', 'week', 'away_team', 'home_team', 'game_time']
 class PickAdmin(admin.ModelAdmin):
-    fields = ['user_name', 'game', 'team_to_win', 'date_submitted']
+    fields = ['user', 'game', 'team_to_win', 'date_submitted']
 class RecordAdmin(admin.ModelAdmin):
-    fields = ['user_name', 'season', 'week', 'wins']
+    fields = ['user', 'season', 'week', 'wins']
 
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Game, GameAdmin)

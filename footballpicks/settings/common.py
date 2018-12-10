@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 import sys
 from datetime import timedelta
+import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -90,7 +91,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-import os
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Static files (CSS, JavaScript, Images)
@@ -104,16 +104,15 @@ STATICFILES_DIRS = (
 )
 
 # Parse database configuration from $DATABASE_URL
-import dj_database_url
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
-DATABASES['default'] =  dj_database_url.config(default='postgres://postgres:postgres@localhost/fbpicks')
-#Use sqlite3 for test database
+DATABASES['default'] = dj_database_url.config(default='postgres://postgres:postgres@localhost/fbpicks')
+# Use sqlite3 for test database
 if ('test' in sys.argv):
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
@@ -170,7 +169,6 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
-    'JWT_EXPIRATION_DELTA': timedelta(hours=24),
+    'JWT_EXPIRATION_DELTA': timedelta(days=30),
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'api.jwt.jwt_response_payload_handler',
 }
-

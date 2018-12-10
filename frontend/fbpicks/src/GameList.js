@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Affix, Button, Modal, Spin, Col, Row, Tooltip } from 'antd';
+import { withRouter } from 'react-router-dom';
 
 import './GameList.css';
 
@@ -20,6 +21,7 @@ class GameList extends Component {
   constructor(props) {
     super(props);
     this.handleShowHidePicks = this.handleShowHidePicks.bind(this);
+    this.handleShowHideScores = this.handleShowHideScores.bind(this);
     this.handleEnterSubmit = this.handleEnterSubmit.bind(this);
     this.handleCancelPicks = this.handleCancelPicks.bind(this);
     this.handleSetPick = this.handleSetPick.bind(this);
@@ -27,9 +29,25 @@ class GameList extends Component {
       games: [],
       picksToSubmit: [],
       showPicks: (props.showPicks === undefined) ? false : props.showPicks,
+      showScores: (props.showScores === undefined) ? false : props.showScores,
       submitting: false,
-      loading: false
+      loading: false,
+      refreshing: false,
+      scoresAvailable: false
     };
+  }
+
+  componentDidMount() {
+      this.retrieveGames();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.season !== this.props.season || prevProps.week !== this.props.week) {
+      this.retrieveGames();
+    } else if (this.props.signedInUser &&
+      (!prevProps.signedInUser || prevProps.signedInUser.id !== this.props.signedInUser.id)) {
+      this.loadInitialPicksForUser();
+    }
   }
 
   handleSetPick(gameIndex, teamID) {
@@ -44,7 +62,7 @@ class GameList extends Component {
     }
     const picksToSubmit = this.state.games.map((game, i) => {
       const user_pick = game.picks.filter((pick) => {
-        if (pick.user_name === this.props.signedInUser.first_name) {
+        if (pick.user.id === this.props.signedInUser.id) {
           return true;
         }
         return false;
@@ -66,14 +84,20 @@ class GameList extends Component {
     }
   }
 
+  handleShowHideScores() {
+    const newShowScores = !this.state.showScores;
+    this.setState({showScores: newShowScores});
+  }
+
   handleEnterSubmit() {
     const submitting = this.state.submitting;
 
     if (submitting) {
       this.submitPicks();
     } else {
-      this.setState({submitting: !submitting,
-                     showPicks: submitting});
+      this.setState({submitting: true,
+                     showPicks: false,
+                     showScores: false});
     }
   }
 
@@ -94,6 +118,7 @@ class GameList extends Component {
       })
       return;
     }
+    const missingPicks = this.state.games.length - picks.length;
     this.setState({loading: true});
     axios.post('/api/v1/picks/', picks)
       .then((response) => {
@@ -102,13 +127,21 @@ class GameList extends Component {
         this.retrieveGames();
         this.setState({submitting: false,
                        showPicks: true});
+        if (missingPicks !== 0) {
+          Modal.info({
+            title: "Some games missing picks",
+            content: `${picks.length} picks submitted successfully, but ${missingPicks} games do not have picks selected`,
+            maskClosable: true,
+          });
+        }
       })
       .catch((error) => {
-        console.log(error);
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
         this.setState({loading: false});
         Modal.error({
           title: "Unable to submit picks",
-          content: "Unable to submit your picks. Please try again\n\n" + error,
+          content: "Unable to submit your picks. Please try again\n\n" + errorString,
           maskClosable: true,
         })
       });
@@ -121,7 +154,34 @@ class GameList extends Component {
   
   render() {
     const showPicksText = this.state.showPicks ? "Hide Picks" : "Show Picks";
+    const showScoresText = this.state.showScores ? "Hide Scores" : "Show Scores";
     const enterSubmitText = this.state.submitting ? "Submit your picks" : "Enter your picks";
+    const refreshScoresButton = (
+      <Button
+        className="TopRightButton"
+        onClick = {() => {
+          this.setState({refreshing: true});
+          this.retrieveScores()
+        }} >
+          Refresh scores
+      </Button>
+    );
+    const showHideScoresButton = !this.state.scoresAvailable ? (
+      <Tooltip title="Game scores are currently not available">
+        <Button
+          className="TopRightButton"
+          disabled="true"
+          onClick={this.handleShowHideScores}>
+            {showScoresText}
+        </Button>
+      </Tooltip>
+    ) : (
+      <Button
+        className="TopRightButton"
+        onClick={this.handleShowHideScores}>
+          {showScoresText}
+      </Button>
+    );
     const enterSubmitButton = this.props.signedInUser === null ? (
       <Tooltip title="Sign in to submit picks">
         <Button
@@ -144,11 +204,17 @@ class GameList extends Component {
       <div className="GameList">
         <Row type="flex" style={{ marginBottom: "15px"}} align="bottom">
           <Col xs={24} sm={14}>
-            {GameListWeekMessage(this.props)}
+            {GameListWeekMessage({week: this.props.week, season: this.props.season})}
           </Col>
           <Col xs={24} sm={10}>
             <Affix>
             <div className="AlignRight">
+              { this.state.showScores &&
+                refreshScoresButton
+              }
+              { !this.state.submitting && this.props.allowScores &&
+                showHideScoresButton
+              }
               { this.state.submitting && 
                 <Button
                   className="TopRightButton"
@@ -175,7 +241,7 @@ class GameList extends Component {
         </Row>
         <Row type="flex" justify="center">
           <Col>
-            { this.state.loading && <Spin size="large" /> }
+            { (this.state.loading || this.state.refreshing) && <Spin size="large" /> }
           </Col>
         </Row>
         {this.state.games.map((game, i) => <Game game={game}
@@ -185,18 +251,17 @@ class GameList extends Component {
                                                  selectedTeam={this.state.picksToSubmit[i]}
                                                  handleSetPick={this.handleSetPick}
                                                  submitting={this.state.submitting}
-                                                 signedInUser={this.props.signedInUser} />)}
+                                                 signedInUser={this.props.signedInUser}
+                                                 showScores={this.state.showScores} />)}
       </div>
     );
   }
 
   retrieveGames() {
     this.setState({loading: true});
-    /* Special workaround for funny DB entries for season 2015 */
-    const season = this.props.season === 2015 ? 0 : this.props.season;
     axios.get('/api/v1/games/', {
         params: {
-          season: season,
+          season: this.props.season,
           week: this.props.week,
         }
       })
@@ -206,29 +271,48 @@ class GameList extends Component {
         this.setState({ "games": games });
         this.setState({ "picksToSubmit": Array(this.state.games.length).fill(null) });
         this.loadInitialPicksForUser();
+        if (this.props.allowScores) {
+          this.retrieveScores();
+        }
       })
       .catch((error) => {
-        console.log(error);
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
         this.setState({loading: false});
         Modal.error({
           title: "Unable to load games",
-          content: "Unable to load games. Please try again.\n\n" + error,
+          content: "Unable to load games. Please try again.\n\n" + errorString,
           maskClosable: true,
         })
       });
   }
 
-  componentDidMount() {
-    this.retrieveGames();
-  }
+  retrieveScores() {
+    axios.get('/api/v1/games/scores/')
+      .then((response) => {
+        this.setState({refreshing: false});
+        const scores = response.data;
+        const games = this.state.games.map((game, i) => {
+          const score = scores.find(score => score.game_id === game.id);
+          if (score !== undefined) {
+            if (!this.state.scoresAvailable) {
+              this.setState({"scoresAvailable": true});
+            }
+            game.score = score;
+          }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.season !== this.props.season) {
-      this.retrieveGames();
-    }
-    if (prevProps.week !== this.props.week) {
-      this.retrieveGames();
-    }
+          return game
+        });
+        this.setState({"games": games});
+      })
+      .catch((error) => {
+        const errorString = error.response ? error.response.data : error;
+        console.log(errorString);
+        this.setState({refreshing: false});
+        this.setState({
+          "scoresAvailable": false
+        });
+      });
   }
 }
 
@@ -237,4 +321,4 @@ GameList.defaultProps = {
     week: '1'
   };
 
-export default GameList;
+export default withRouter(GameList);

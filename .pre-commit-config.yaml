@@ -1,0 +1,16 @@
+repos:
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v1.2.3
+    hooks:
+    -   id: flake8
+        exclude:
+            migrations,
+            espn_api,
+            footballseason/templatetags,
+            footballseason/views.py,
+            footballseason/admin.py,
+            footballseason/forms.py,
+            footballseason/views.py,
+            footballseason/test_models.py,
+            footballseason/fb_utils.py,
+            footballseason/urls.py,

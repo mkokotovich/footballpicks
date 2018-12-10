@@ -9,10 +9,10 @@ router = DefaultRouter()
 router.register(r'games', v1_views.GameViewSet)
 router.register(r'teams', v1_views.TeamViewSet)
 router.register(r'picks', v1_views.PickViewSet)
-router.register(r'records', v1_views.RecordViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     url(r'^auth/', obtain_jwt_token),
+    url(r'^records/$', v1_views.RecordsView.as_view()),
     url(r'^', include(router.urls)),
 ]

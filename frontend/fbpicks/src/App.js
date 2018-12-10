@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
+import { Route, Redirect, Link } from 'react-router-dom';
 import { Row, Col } from 'antd';
 
 import SignIn from './SignIn';
 import Home from './Home';
+import Records from './Records';
 
 import './App.css';
 
@@ -56,11 +58,15 @@ class App extends Component {
       return 1;
     }
     const tdelta = now - week1Start;
-    const week = Math.ceil((tdelta/(60*60*24))/7);
+    const week = Math.ceil(((tdelta/1000)/(60*60*24))/7);
+    console.log("tdelta: " + tdelta + " week: " + week);
     return week > 17 ? 17 : week;
   }
 
   render() {
+    const currentSeason = this.getCurrentSeason().toString();
+    const currentWeek = this.getCurrentWeek().toString();
+
     return (
       <div className="App">
         <Row
@@ -69,10 +75,46 @@ class App extends Component {
           className="navbar"
           align="middle"
           >
-          <Col className="Logo">Football Picks</Col>
+          <Col className="Logo"><Link to="/" style={{ textDecoration: "none", color: '#663300' }}>Football Picks</Link></Col>
           <Col><SignIn handleAuthChange={this.handleAuthChange} /></Col>
         </Row>
-        <Home currentSeason={this.getCurrentSeason().toString()} currentWeek={this.getCurrentWeek().toString()} signedInUser={this.state.user} />
+        <Route
+          exact
+          path="/"
+          render={() => {
+            return <Redirect to={`/games/${currentSeason}/${currentWeek}`}/>
+          }}
+        />
+        <Route
+          exact
+          path="/records"
+          render={() => {
+            return <Records currentSeason={this.getCurrentSeason().toString()} currentWeek={this.getCurrentWeek().toString()} signedInUser={this.state.user} />;
+          }}
+        />
+        <Route
+          exact
+          path="/games"
+          render={() => {
+            console.log(`Matched /games, redirecting to /games/${currentSeason}/${currentWeek}`);
+            return <Redirect to={`/games/${currentSeason}/${currentWeek}`}/>
+          }}
+        />
+        <Route
+          exact
+          path="/games/:season"
+          render={({ match }) => {
+            console.log(`Matched /games/${match.params.season}, redirecting to /games/${match.params.season}/${currentWeek}`);
+            return <Redirect to={`/games/${match.params.season}/${currentWeek}`}/>
+          }}
+        />
+        <Route
+          path="/games/:season/:week"
+          render={({ match }) => {
+            console.log(`Matched /games/${match.params.season}/${match.params.week}, returning Home with season=${match.params.season} and week=${match.params.week}`);
+            return <Home currentSeason={this.getCurrentSeason().toString()} currentWeek={this.getCurrentWeek().toString()} season={match.params.season} week={match.params.week} signedInUser={this.state.user} />;
+          }}
+        />
       </div>
     );
   }
