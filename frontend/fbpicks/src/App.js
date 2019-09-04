@@ -35,6 +35,7 @@ class App extends Component {
   }
 
   // This is ugly, but not sure if there is a better way
+  // Week 1 start should be the Tuesday after Labor Day
   getWeek1StartForSeason = (season) => {
     // Date months are 0-indexed, 8==sept
     if (season === 2015) {
@@ -45,6 +46,16 @@ class App extends Component {
         return new Date(2017,8,5);
     } else if (season === 2018) {
         return new Date(2018,8,4);
+    } else if (season === 2019) {
+        return new Date(2019,8,3);
+    } else if (season === 2020) {
+        return new Date(2020,8,7);
+    } else if (season === 2021) {
+        return new Date(2021,8,6);
+    } else if (season === 2022) {
+        return new Date(2022,8,5);
+    } else if (season === 2023) {
+        return new Date(2023,8,3);
     }
     return new Date(2015,8,8);
 
