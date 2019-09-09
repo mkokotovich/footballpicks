@@ -7,6 +7,7 @@ def get_week1_start():
 
 # the start of "week 1", the tuesday before the first game
 # Not sure of a prettier way to do this
+# Week 1 start should be the Tuesday after Labor Day
 def get_week1_start_for_season(season):
     if (season == 2015):
         week1_start = datetime(2015,9,8,0,0,0)
@@ -16,6 +17,16 @@ def get_week1_start_for_season(season):
         week1_start = datetime(2017,9,5,0,0,0)
     elif (season == 2018):
         week1_start = datetime(2018,9,4,0,0,0)
+    elif (season == 2019):
+        week1_start = datetime(2019,9,3,0,0,0)
+    elif (season == 2020):
+        week1_start = datetime(2020,9,7,0,0,0)
+    elif (season == 2021):
+        week1_start = datetime(2021,9,6,0,0,0)
+    elif (season == 2022):
+        week1_start = datetime(2022,9,5,0,0,0)
+    elif (season == 2023):
+        week1_start = datetime(2023,9,3,0,0,0)
     else:
         week1_start = datetime(2015,9,8,0,0,0)
     return week1_start
