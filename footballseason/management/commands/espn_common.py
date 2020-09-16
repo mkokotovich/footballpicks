@@ -1,6 +1,6 @@
 
 espn_team_names = {
-    "wsh": "Washington Redskins",
+    "wsh": "Washington Football Team",
     "ten": "Tennessee Titans",
     "tb": "Tampa Bay Buccaneers",
     "sea": "Seattle Seahawks",
@@ -9,7 +9,7 @@ espn_team_names = {
     "lar": "Los Angeles Rams",
     "pit": "Pittsburgh Steelers",
     "phi": "Philadelphia Eagles",
-    "oak": "Oakland Raiders",
+    "lv": "Las Vegas Raiders",
     "nyj": "New York Jets",
     "nyg": "New York Giants",
     "no": "New Orleans Saints",
