@@ -13,7 +13,7 @@ Indianapolis
 Houston
 Kansas City
 L.A. Chargers
-Oakland
+Las Vegas
 Denver
 Philadelphia
 Dallas
@@ -35,7 +35,7 @@ San Francisco
 
 
 cbs_team_names = {
-    "Washington": "Washington Redskins",
+    "Washington": "Washington Football Team",
     "Tennessee": "Tennessee Titans",
     "Tampa Bay": "Tampa Bay Buccaneers",
     "Seattle": "Seattle Seahawks",
@@ -44,7 +44,7 @@ cbs_team_names = {
     "L.A. Rams": "Los Angeles Rams",
     "Pittsburgh": "Pittsburgh Steelers",
     "Philadelphia": "Philadelphia Eagles",
-    "Oakland": "Oakland Raiders",
+    "Las Vegas": "Las Vegas Raiders",
     "N.Y. Jets": "New York Jets",
     "N.Y. Giants": "New York Giants",
     "New Orleans": "New Orleans Saints",
