@@ -6,6 +6,7 @@ import urllib.request
 
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.deletion import ProtectedError
 from bs4 import BeautifulSoup
 
 from footballseason.models import Game, Team
@@ -28,6 +29,7 @@ class Command(BaseCommand):
         with urllib.request.urlopen(url) as response:
             html = response.read()
         soup = BeautifulSoup(html, 'html.parser')
+        all_game_ids = []
         # Each table is a day (e.g. Thursday, Sunday, Monday)
         for table in soup.findAll("table", class_="schedule"):
             odd = table.find_all('tr', {"class": "odd"})
@@ -61,10 +63,21 @@ class Command(BaseCommand):
                     obj = Game(season=season, week=week, home_team=home, away_team=away, game_time=game_datetime)
                     LOG.info("Adding: {0}".format(obj))
                 else:
-                    obj.game_time = game_datetime
-                    LOG.info(f"{obj} was already on the schedule, updating gametime and saving")
+                    if obj.game_time != game_datetime:
+                        obj.game_time = game_datetime
+                        LOG.info(f"{obj} was already on the schedule, updating gametime and saving")
                 finally:
                     obj.save()
+                    all_game_ids.append(obj.id)
+
+        removed_games = Game.objects.filter(season=season, week=week).exclude(id__in=all_game_ids)
+
+        if removed_games:
+            try:
+                LOG.info(f"Removing {removed_games.count()} games: {list(removed_games)}")
+                removed_games.delete()
+            except ProtectedError:
+                LOG.info("Unable to remove games with picks")
 
     def add_all_games(self):
         for week in self.week_list:
