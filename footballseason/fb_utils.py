@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from math import ceil
 
+NUM_WEEKS = 18
+
 def get_week1_start():
     current_season = get_season()
     return get_week1_start_for_season(current_season)
@@ -51,7 +53,7 @@ def get_first_and_last_weeks_for_a_month(season, month):
     first_week = num_weeks
     # Find last week of month
     last_gameday = gameday
-    while gameday.month == month and num_weeks < 18:
+    while gameday.month == month and num_weeks < NUM_WEEKS + 1:
         gameday += timedelta(days=(7))
         num_weeks += 1
     last_week = num_weeks - 1
@@ -72,7 +74,7 @@ def get_week():
         return 1
     tdelta = now - week1_start
     week = int(ceil((tdelta.total_seconds()/(60*60*24))/7))
-    if (week > 17):
-        week = 17
+    if (week > NUM_WEEKS):
+        week = NUM_WEEKS
     return week
 

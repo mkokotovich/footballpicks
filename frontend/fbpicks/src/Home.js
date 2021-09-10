@@ -36,7 +36,7 @@ class Home extends Component {
   }
 
   render() {
-    const weeks = Array(17).fill().map((e,i)=>i+1);
+    const weeks = Array(18).fill().map((e,i)=>i+1);
     const startingSeason = 2015;
     const seasons = Array(this.props.currentSeason - startingSeason + 1)
                     .fill().map((e,i)=>i+startingSeason);

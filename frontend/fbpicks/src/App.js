@@ -71,7 +71,7 @@ class App extends Component {
     const tdelta = now - week1Start;
     const week = Math.ceil(((tdelta/1000)/(60*60*24))/7);
     console.log("tdelta: " + tdelta + " week: " + week);
-    return week > 17 ? 17 : week;
+    return week > 18 ? 18 : week;
   }
 
   render() {

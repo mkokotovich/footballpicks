@@ -32,4 +32,5 @@ services:
       - ./docker/db/:/fbpicks_db
     environment:
       POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: fbpicks

@@ -21,7 +21,7 @@ LOG = logging.getLogger(__name__)
 class Command(BaseCommand):
 
     season = fb_utils.get_season()
-    week_list = range(1, 18)
+    week_list = range(1, fb_utils.NUM_WEEKS + 1)
 
     def add_games_from_one_week(self, season, week):
         url = "http://espn.go.com/nfl/schedule/_/year/{0}/week/{1}".format(season, week)
