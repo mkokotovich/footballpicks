@@ -52,27 +52,39 @@ class Team extends Component {
         {this.props.team.team_name} 
       </span> 
     );
+    const teamLogo = (
+      <img
+        className="TeamLogo"
+        src={"footballseason/static/logos/" + this.props.team.logo_name}
+        alt="team logo"
+        height="72px"
+      />
+    );
     const teamName = this.props.submitting ? (
-      <Row type="flex" justify={justify} >
-        <form style={{width: "100%"}}>
-          <label>
+      <form style={{width: "100%"}}>
+        <label>
+          <Row><Col>{ teamLogo }</Col></Row>
+          <Row type="flex" justify={justify} >
             <Col xs={24} sm={{ span: 22, push: smPush}} md={{ span: 23, push: mdPush}}>
               { teamNameOnly }
             </Col>
             <Col xs={24} sm={{span: 2, pull: smPull}} md={{ span: 1, pull: mdPull}}>
               { checkbox }
             </Col>
-          </label>
-        </form>
-      </Row>
+          </Row>
+        </label>
+      </form>
     ) : (
-      <Row type="flex" justify={justify}>
-        <Col>
-        <span className="TeamName">
-          {this.props.team.team_name} 
-        </span> 
-        </Col>
-      </Row>
+      <>
+        <Row><Col>{ teamLogo }</Col></Row>
+        <Row type="flex" justify={justify}>
+          <Col>
+          <span className="TeamName">
+            {this.props.team.team_name} 
+          </span> 
+          </Col>
+        </Row>
+      </>
     );
 
     return (

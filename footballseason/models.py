@@ -11,6 +11,7 @@ class Team(models.Model):
     wins = models.IntegerField(default=0)
     loses = models.IntegerField(default=0)
     ties = models.IntegerField(default=0)
+    logo_name = models.CharField(max_length=1024)
 
     def record(self):
         if (self.ties == 0):

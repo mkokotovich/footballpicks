@@ -2,6 +2,9 @@
   font-size: 1.875em;
   line-height: 50%;
 }
+.TeamLogo {
+  padding-bottom: 10px;
+}
 .TeamRecord {
   white-space: nowrap;
 }
