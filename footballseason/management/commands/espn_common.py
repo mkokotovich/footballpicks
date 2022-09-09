@@ -1,6 +1,6 @@
 
 espn_team_names = {
-    "wsh": "Washington Football Team",
+    "wsh": "Washington Commanders",
     "ten": "Tennessee Titans",
     "tb": "Tampa Bay Buccaneers",
     "sea": "Seattle Seahawks",
