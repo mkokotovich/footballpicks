@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '=c8u^#sv!fqbotpc2(n7pc!c0n99l98)dz!wp&u%($$vcn5-)9'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "this is not a secret key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,6 +43,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
+    'rest_framework_jwt',
+    'rest_framework_jwt.blacklist',
     'footballseason',
 )
 
