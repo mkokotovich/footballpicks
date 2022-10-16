@@ -1,7 +1,6 @@
 FROM node:10.16
 
 # set working directory
-RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
 
 COPY yarn.lock /usr/src/app/yarn.lock
