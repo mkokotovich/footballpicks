@@ -15,18 +15,6 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@db/fbpicks
       DJANGO_SETTINGS_MODULE: footballpicks.settings.local
-  web:
-    build:
-      context: frontend/fbpicks
-      dockerfile: Dockerfile
-    command: yarn start
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend/fbpicks:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - django
   db:
     image: postgres:14
     volumes:
