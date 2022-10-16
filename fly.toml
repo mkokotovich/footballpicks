@@ -6,10 +6,14 @@ kill_timeout = 5
 processes = []
 
 [env]
+  DJANGO_SETTINGS_MODULE = "footballpicks.settings.prod"
 
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
+
+[deploy]
+  release_command = "python manage.py migrate"
 
 [[services]]
   http_checks = []
