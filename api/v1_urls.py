@@ -14,5 +14,6 @@ router.register(r'picks', v1_views.PickViewSet)
 urlpatterns = [
     re_path(r'^auth/', obtain_jwt_token),
     re_path(r'^records/$', v1_views.RecordsView.as_view()),
+    re_path(r'^update/$', v1_views.UpdateView.as_view()),
     re_path(r'^', include(router.urls)),
 ]

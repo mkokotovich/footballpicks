@@ -147,3 +147,14 @@ class RecordsView(APIView):
         }
 
         return Response(data)
+
+
+class UpdateView(APIView):
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+        from django.core.management import call_command
+
+        call_command("update_records")
+
+        return Response({"status": "success"})
