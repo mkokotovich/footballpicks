@@ -7,8 +7,14 @@ Please install and use the flake8 pre-commit hook, this will help PRs stay focus
 pre-commit install --install-hooks
 ```
 
-To deploy to heroku:
+To deploy to fly.io:
 
 ```
-git push origin master:heroku_prod
+flyctl deploy
+```
+
+To restart DB on fly.io:
+
+```
+fly pg restart -a fbpickspg --skip-health-checks --force
 ```
