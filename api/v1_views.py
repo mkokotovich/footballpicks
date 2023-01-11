@@ -24,7 +24,7 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     pagination_class = APIPagination
-    filter_fields = ('home_team', 'away_team', 'season', 'week')
+    filterset_fields = ('home_team', 'away_team', 'season', 'week')
     ordering = "game_time"
     permission_classes = (IsAdminUserOrReadOnly,)
 
@@ -66,7 +66,7 @@ class GameViewSet(viewsets.ModelViewSet):
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
-    filter_fields = ('team_name',)
+    filterset_fields = ('team_name',)
     ordering = "team_name"
     permission_classes = (IsAdminUserOrReadOnly,)
 
@@ -75,7 +75,7 @@ class PickViewSet(viewsets.ModelViewSet):
     queryset = Pick.objects.all()
     serializer_class = PickSerializer
     pagination_class = APIPagination
-    filter_fields = ('user', 'game', 'team_to_win')
+    filterset_fields = ('user', 'game', 'team_to_win')
     ordering = "-id"
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -147,3 +147,14 @@ class RecordsView(APIView):
         }
 
         return Response(data)
+
+
+class UpdateView(APIView):
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+        from django.core.management import call_command
+
+        call_command("update_records")
+
+        return Response({"status": "success"})

@@ -35,7 +35,7 @@ San Francisco
 
 
 cbs_team_names = {
-    "Washington": "Washington Football Team",
+    "Washington": "Washington Commanders",
     "Tennessee": "Tennessee Titans",
     "Tampa Bay": "Tampa Bay Buccaneers",
     "Seattle": "Seattle Seahawks",

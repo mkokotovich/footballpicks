@@ -1,33 +1,22 @@
 version: '3'
 services:
   django:
+    platform: linux/amd64
     build:
       context: .
-      dockerfile: docker/django/Dockerfile
-    command: python manage.py runserver 0.0.0.0:8080
+      dockerfile: Dockerfile
+    command: python manage.py runserver --nostatic 0.0.0.0:8000
     ports:
-      - "8080:8080"
+      - "8000:8000"
     volumes:
-      - .:/usr/src/app
+      - .:/code
     depends_on:
       - db
     environment:
       DATABASE_URL: postgres://postgres:postgres@db/fbpicks
       DJANGO_SETTINGS_MODULE: footballpicks.settings.local
-  web:
-    build:
-      context: frontend/fbpicks
-      dockerfile: Dockerfile
-    command: yarn start
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend/fbpicks:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - django
   db:
-    image: postgres:9.6-alpine
+    image: postgres:14
     volumes:
       - ./docker/db/:/fbpicks_db
     environment:

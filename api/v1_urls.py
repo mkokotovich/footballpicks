@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import re_path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_jwt.views import obtain_jwt_token
 
@@ -12,7 +12,8 @@ router.register(r'picks', v1_views.PickViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    url(r'^auth/', obtain_jwt_token),
-    url(r'^records/$', v1_views.RecordsView.as_view()),
-    url(r'^', include(router.urls)),
+    re_path(r'^auth/', obtain_jwt_token),
+    re_path(r'^records/$', v1_views.RecordsView.as_view()),
+    re_path(r'^update/$', v1_views.UpdateView.as_view()),
+    re_path(r'^', include(router.urls)),
 ]

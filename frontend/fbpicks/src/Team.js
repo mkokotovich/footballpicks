@@ -55,7 +55,7 @@ class Team extends Component {
     const teamLogo = (
       <img
         className="TeamLogo"
-        src={"footballseason/static/logos/" + this.props.team.logo_name}
+        src={"logos/" + this.props.team.logo_name}
         alt="team logo"
         height="72px"
       />
