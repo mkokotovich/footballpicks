@@ -19,10 +19,11 @@ To restart DB on fly.io:
 fly pg restart -a fbpickspg --skip-health-checks --force
 ```
 
-To load a new season's schedule, run:
+To load a new season's schedule, and reset the win/loss records, run:
 
 ```
 python manage.py generate_schedule
+python manage.py reset_team_records
 ```
 
 To run this in prod, first connect to the server:
