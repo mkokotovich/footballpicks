@@ -1,9 +1,9 @@
-Django==4.1.2
+Django==4.2.5
 djangorestframework==3.14.0
-django-filter==22.1
-beautifulsoup4==4.8.0
-dj-database-url==0.5.0
-psycopg2-binary==2.9.3
+django-filter==23.2
+beautifulsoup4==4.12.2
+dj-database-url==2.1.0
+psycopg2-binary==2.9.7
 dj-static==0.0.6
 djangorestframework-jwt==1.11.0
 drf-jwt==1.19.2

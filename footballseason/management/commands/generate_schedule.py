@@ -20,7 +20,6 @@ LOG = logging.getLogger(__name__)
 
 # Call from CLI via: $ python manage.py generate_schedule
 class Command(BaseCommand):
-
     season = fb_utils.get_season()
     week_list = range(1, fb_utils.NUM_WEEKS + 1)
 
@@ -29,7 +28,7 @@ class Command(BaseCommand):
         LOG.info("url: {0}".format(url))
         with urllib.request.urlopen(url) as response:
             html = response.read()
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(html, "html.parser")
         all_game_ids = []
         # Each div is a day (e.g. Thursday, Sunday, Monday)
         for div in soup.findAll("div", "ScheduleTables"):
@@ -41,7 +40,7 @@ class Command(BaseCommand):
                 all_results = table.find_all("tr")
                 for row in all_results:
                     # Each row is one game
-                    game_time_data = row.find('td', class_="date__col")
+                    game_time_data = row.find("td", class_="date__col")
                     if game_time_data is None:
                         # bye teams
                         continue
@@ -70,7 +69,9 @@ class Command(BaseCommand):
                         home = Team.objects.get(team_name=home_name)
                     except ObjectDoesNotExist:
                         # Could not find team, this shouldn't happen
-                        LOG.info(f"Count not find either team {home_name} or {away_name}, unable to add game to schedule")
+                        LOG.info(
+                            f"Count not find either team {home_name} or {away_name}, unable to add game to schedule"
+                        )
                         sys.exit(1)
                     try:
                         obj = Game.objects.get(season=season, week=week, home_team=home, away_team=away)

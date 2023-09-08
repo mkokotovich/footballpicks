@@ -19,10 +19,12 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path(r'footballseason/login/', auth_views.LoginView.as_view(template_name='footballseason/login.html'), name="login"),
-    path(r'footballseason/logout/', auth_views.LogoutView.as_view(), {'next_page': '/footballseason/'}, name="logout"),
-    path(r'footballseason/', include('footballseason.urls')),
-    path(r'old/', RedirectView.as_view(url='/footballseason/', permanent=False), name='footballseason'),
-    path(r'admin/', admin.site.urls),
-    path(r'api/v1/', include('api.v1_urls')),
+    path(
+        r"footballseason/login/", auth_views.LoginView.as_view(template_name="footballseason/login.html"), name="login"
+    ),
+    path(r"footballseason/logout/", auth_views.LogoutView.as_view(), {"next_page": "/footballseason/"}, name="logout"),
+    path(r"footballseason/", include("footballseason.urls")),
+    path(r"old/", RedirectView.as_view(url="/footballseason/", permanent=False), name="footballseason"),
+    path(r"admin/", admin.site.urls),
+    path(r"api/v1/", include("api.v1_urls")),
 ]

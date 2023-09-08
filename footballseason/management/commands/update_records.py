@@ -17,10 +17,11 @@ LOG = logging.getLogger(__name__)
 
 # Call from CLI via: $ python manage.py update_records
 class Command(BaseCommand):
-
     def get_last_game_for_team(self, team):
-        games = Game.objects.filter(Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))).order_by('-game_time')
-        if (len(games) == 0):
+        games = Game.objects.filter(
+            Q(game_time__lte=timezone.now()) & Q(Q(home_team=team) | Q(away_team=team))
+        ).order_by("-game_time")
+        if len(games) == 0:
             LOG.error(f"Error: unable to find last game for team {team}")
             return None
         last_game = games[0]
@@ -50,17 +51,17 @@ class Command(BaseCommand):
 
         with urllib.request.urlopen(url) as response:
             html = response.read()
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(html, "html.parser")
 
-        all_results = soup.find_all('tr', {"class": "TableBase-bodyTr"})
+        all_results = soup.find_all("tr", {"class": "TableBase-bodyTr"})
         successful_updates = 0
         for row in all_results:
             # Each row is one team's record
-            entries = row.find_all('td')
+            entries = row.find_all("td")
             # it goes name, W, L, T
             cbs_team_name_raw = entries[0].text.strip()
             # Remove playoff indicators (e.g.  - x)
-            cbs_team_name = cbs_team_name_raw.split(' - ')[0]
+            cbs_team_name = cbs_team_name_raw.split(" - ")[0]
             team_name = cbs_common.cbs_team_names[cbs_team_name]
             wins = int(entries[1].text.strip())
             loses = int(entries[2].text.strip())
@@ -69,11 +70,11 @@ class Command(BaseCommand):
             try:
                 team = Team.objects.get(team_name=team_name)
                 # An existing team was found, update standings
-                if (team.wins != wins or team.loses != loses or team.ties != ties):
+                if team.wins != wins or team.loses != loses or team.ties != ties:
                     LOG.info(f"{team_name} needs updating")
                     successful_updates += 1
 
-                if (team.wins < wins):
+                if team.wins < wins:
                     # This team won, update records. Assuming we update at least once a week
                     self.update_user_records(team)
 

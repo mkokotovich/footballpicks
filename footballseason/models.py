@@ -14,7 +14,7 @@ class Team(models.Model):
     logo_name = models.CharField(max_length=1024)
 
     def record(self):
-        if (self.ties == 0):
+        if self.ties == 0:
             recordstr = "({0}-{1})".format(self.wins, self.loses)
         else:
             recordstr = "({0}-{1}-{2})".format(self.wins, self.loses, self.ties)
@@ -27,17 +27,19 @@ class Team(models.Model):
 class Game(models.Model):
     season = models.IntegerField(default=0)
     week = models.IntegerField(default=0)
-    home_team = models.ForeignKey(Team, related_name='game_home_team', on_delete=models.PROTECT)
-    away_team = models.ForeignKey(Team, related_name='game_away_team', on_delete=models.PROTECT)
-    game_time = models.DateTimeField('Game time')
+    home_team = models.ForeignKey(Team, related_name="game_home_team", on_delete=models.PROTECT)
+    away_team = models.ForeignKey(Team, related_name="game_away_team", on_delete=models.PROTECT)
+    game_time = models.DateTimeField("Game time")
 
     def gametime(self):
         try:
             # Season 2015 was different
-            if (self.season == 2015):
+            if self.season == 2015:
                 # Week two was entered manually and has to be treated differently
-                if (self.week <= 2):
-                    gametimestr = self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p")
+                if self.week <= 2:
+                    gametimestr = (
+                        self.game_time.replace(tzinfo=timezone.utc).astimezone(tz=None).strftime("%b %d, %I:%M %p")
+                    )
                 else:
                     gametimestr = self.game_time.strftime("%b %d, %I:%M %p")
             # All other seasons were entered as UTC time
@@ -57,9 +59,9 @@ class Game(models.Model):
 
 class Pick(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
-    game = models.ForeignKey(Game, related_name='picks', on_delete=models.PROTECT)
+    game = models.ForeignKey(Game, related_name="picks", on_delete=models.PROTECT)
     team_to_win = models.ForeignKey(Team, on_delete=models.PROTECT)
-    date_submitted = models.DateTimeField('Date pick was submitted', auto_now_add=True)
+    date_submitted = models.DateTimeField("Date pick was submitted", auto_now_add=True)
 
     def __str__(self):
         return "%s picks %s to win" % (self.user.first_name, self.team_to_win)

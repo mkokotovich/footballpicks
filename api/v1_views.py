@@ -24,7 +24,7 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     pagination_class = APIPagination
-    filterset_fields = ('home_team', 'away_team', 'season', 'week')
+    filterset_fields = ("home_team", "away_team", "season", "week")
     ordering = "game_time"
     permission_classes = (IsAdminUserOrReadOnly,)
 
@@ -49,7 +49,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
         current_season = utils.get_season()
         current_week = utils.get_week()
-        games = Game.objects.order_by('game_time').filter(season=current_season, week=current_week)
+        games = Game.objects.order_by("game_time").filter(season=current_season, week=current_week)
 
         score_list = [
             {
@@ -57,7 +57,8 @@ class GameViewSet(viewsets.ModelViewSet):
                 "away_score": score[1],
                 "home_score": score[3],
                 "time": score[4],
-            } for score in scores.values()
+            }
+            for score in scores.values()
         ]
 
         return Response(score_list)
@@ -66,7 +67,7 @@ class GameViewSet(viewsets.ModelViewSet):
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
-    filterset_fields = ('team_name',)
+    filterset_fields = ("team_name",)
     ordering = "team_name"
     permission_classes = (IsAdminUserOrReadOnly,)
 
@@ -75,7 +76,7 @@ class PickViewSet(viewsets.ModelViewSet):
     queryset = Pick.objects.all()
     serializer_class = PickSerializer
     pagination_class = APIPagination
-    filterset_fields = ('user', 'game', 'team_to_win')
+    filterset_fields = ("user", "game", "team_to_win")
     ordering = "-id"
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -94,14 +95,14 @@ class RecordsView(APIView):
     permission_classes = (IsAdminUserOrReadOnly,)
 
     def get(self, request):
-        season_id = request.query_params.get('season', None)
-        week_id = request.query_params.get('week', None)
+        season_id = request.query_params.get("season", None)
+        week_id = request.query_params.get("week", None)
 
         aggregate_list = []
         current_time = timezone.now()
 
         for user in User.objects.all():
-            if (user.username == 'admin'):
+            if user.username == "admin":
                 continue
 
             # First find the number of wins from the Record table
@@ -126,24 +127,26 @@ class RecordsView(APIView):
                 total_query = total_query.filter(game__week=week_id)
 
             total_games = total_query.count()
-            if (total_games == 0):
+            if total_games == 0:
                 continue
 
             percentage = win_sum / total_games
-            aggregate_list.append({
-                'name': user.first_name,
-                'win': win_sum,
-                'loss': total_games - win_sum,
-                'percentage': percentage,
-            })
+            aggregate_list.append(
+                {
+                    "name": user.first_name,
+                    "win": win_sum,
+                    "loss": total_games - win_sum,
+                    "percentage": percentage,
+                }
+            )
 
         if week_id:
-            totals = sorted(aggregate_list, key=lambda record: record['win'], reverse=True)
+            totals = sorted(aggregate_list, key=lambda record: record["win"], reverse=True)
         else:
-            totals = sorted(aggregate_list, key=lambda record: record['percentage'], reverse=True)
+            totals = sorted(aggregate_list, key=lambda record: record["percentage"], reverse=True)
 
         data = {
-            'results': totals,
+            "results": totals,
         }
 
         return Response(data)

@@ -66,5 +66,5 @@ cbs_team_names = {
     "Buffalo": "Buffalo Bills",
     "Baltimore": "Baltimore Ravens",
     "Atlanta": "Atlanta Falcons",
-    "Arizona": "Arizona Cardinals"
+    "Arizona": "Arizona Cardinals",
 }

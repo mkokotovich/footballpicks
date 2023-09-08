@@ -1,4 +1,3 @@
-
 espn_team_names = {
     "wsh": "Washington Commanders",
     "ten": "Tennessee Titans",
@@ -31,5 +30,5 @@ espn_team_names = {
     "buf": "Buffalo Bills",
     "bal": "Baltimore Ravens",
     "atl": "Atlanta Falcons",
-    "ari": "Arizona Cardinals"
+    "ari": "Arizona Cardinals",
 }
