@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Team, Game, Pick, Record
+from .models import Team
 
 
 class TeamTests(TestCase):

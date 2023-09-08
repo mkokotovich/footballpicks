@@ -1,19 +1,17 @@
 import logging
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.contrib import messages
-from datetime import datetime, timedelta
+from datetime import timedelta
 import calendar
 from bs4 import BeautifulSoup
 import urllib.request
-import operator
 from footballseason.espn_api import espn_api_v3
 
 from .models import Game, Team, Pick, Record
@@ -39,7 +37,7 @@ def update_records(team):
     try:
         last_game = get_last_game_for_team(team)
         last_game_week = last_game.week
-    except:
+    except Exception:
         # Error
         LOG.error("Error: Unable to find game to update records. Team: {0}".format(team))
         return 0
@@ -48,7 +46,7 @@ def update_records(team):
     for pick in winning_picks:
         try:
             record = Record.objects.get(user=pick.user, season=utils.get_season(), week=last_game_week)
-        except:
+        except Exception:
             record = Record(user=pick.user, season=utils.get_season(), week=last_game_week, wins=0)
         record.wins += 1
         record.save()
@@ -143,7 +141,7 @@ def vote(request, season_id, week_id):
     for index, game in enumerate(games_list):
         try:
             selected_team_id = int(request.POST["game%d" % (index + 1)])
-        except:
+        except Exception:
             selected_team_id = 0
             messages.warning(request, "No pick entered for {0}".format(game))
 

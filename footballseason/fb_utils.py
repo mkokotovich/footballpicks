@@ -57,7 +57,6 @@ def get_first_and_last_weeks_for_a_month(season, month):
         num_weeks += 1
     first_week = num_weeks
     # Find last week of month
-    last_gameday = gameday
     while gameday.month == month and num_weeks < NUM_WEEKS + 1:
         gameday += timedelta(days=(7))
         num_weeks += 1

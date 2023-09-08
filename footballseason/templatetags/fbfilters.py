@@ -1,5 +1,4 @@
 from django.template import Library
-from footballseason.models import Team, Game
 
 register = Library()
 
