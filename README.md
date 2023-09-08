@@ -18,3 +18,16 @@ To restart DB on fly.io:
 ```
 fly pg restart -a fbpickspg --skip-health-checks --force
 ```
+
+To load a new season's schedule, run:
+
+```
+python manage.py generate_schedule
+```
+
+To run this in prod, first connect to the server:
+
+```
+fly ssh console
+cd /code
+```

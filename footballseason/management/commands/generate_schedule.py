@@ -49,6 +49,9 @@ class Command(BaseCommand):
                         # Just default to noon game for TBD games
                         game_time = "1:00 PM"
                     # "1:00 PM"
+                    if game_time == "LIVE":
+                        # Skip games that happen to be currently playing
+                        continue
                     game_time_stamp = f"{game_time} {date_string}"
                     game_datetime = datetime.datetime.strptime(game_time_stamp, "%I:%M %p %A, %B %d, %Y")
                     # Times are in Eastern, adjust to Central
