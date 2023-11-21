@@ -55,7 +55,13 @@ class App extends Component {
     } else if (season === 2022) {
         return new Date(2022,8,5);
     } else if (season === 2023) {
-        return new Date(2023,8,3);
+        return new Date(2023,8,5);
+    } else if (season === 2024) {
+        return new Date(2024,8,3);
+    } else if (season === 2025) {
+        return new Date(2025,8,2);
+    } else if (season === 2026) {
+        return new Date(2026,8,8);
     }
     return new Date(2015,8,8);
 

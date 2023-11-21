@@ -33,6 +33,10 @@ def get_week1_start_for_season(season):
         week1_start = datetime(2023, 9, 5, 0, 0, 0)
     elif season == 2024:
         week1_start = datetime(2024, 9, 3, 0, 0, 0)
+    elif season == 2025:
+        week1_start = datetime(2025, 9, 2, 0, 0, 0)
+    elif season == 2026:
+        week1_start = datetime(2026, 9, 8, 0, 0, 0)
     else:
         week1_start = datetime(2015, 9, 8, 0, 0, 0)
     return week1_start
