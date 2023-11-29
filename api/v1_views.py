@@ -152,7 +152,7 @@ class RecordsView(APIView):
         return Response(data)
 
 
-class UpdateView(APIView):
+class RecordsUpdateView(APIView):
     permission_classes = (IsAdminUserOrReadOnly,)
 
     def get(self, request):
@@ -161,3 +161,14 @@ class UpdateView(APIView):
         call_command("update_records")
 
         return Response({"status": "success"})
+
+
+class ScheduleUpdateView(APIView):
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+        from django.core.management import call_command
+
+        result = call_command("generate_schedule", "--update-only")
+
+        return Response({"status": "success", "result": result})

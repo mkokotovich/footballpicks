@@ -26,7 +26,13 @@ python manage.py generate_schedule
 python manage.py reset_team_records
 ```
 
-To run this in prod, first connect to the server:
+To reload the schedule (to update for flex games, etc)
+
+```
+python manage.py generate_schedule
+```
+
+To run these in prod, first connect to the server:
 
 ```
 fly ssh console
