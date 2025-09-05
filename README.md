@@ -7,6 +7,13 @@ Please install and use the flake8 pre-commit hook, this will help PRs stay focus
 pre-commit install --install-hooks
 ```
 
+To set up local environment
+
+```
+docker compose down && docker compose build && docker compose up
+./docker/first_run_init.sh
+```
+
 To deploy to fly.io:
 
 ```

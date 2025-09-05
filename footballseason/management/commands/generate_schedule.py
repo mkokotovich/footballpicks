@@ -34,10 +34,15 @@ class Command(BaseCommand):
         soup = BeautifulSoup(html, "html.parser")
         all_game_ids = []
         # Each div is a day (e.g. Thursday, Sunday, Monday)
+        prev_date_string = ""
         for div in soup.findAll("div", "ScheduleTables"):
             # Find the date of this day
             date_string = div.find("div", class_="Table__Title").getText().strip()
             LOG.info(f"found games on {date_string}")
+            if "TBD" in date_string:
+                LOG.info(f"Skipping date ({date_string}) and replacing it with ({prev_date_string})")
+                date_string = prev_date_string
+            prev_date_string = date_string
 
             for table in div.findAll("table", class_="Table"):
                 all_results = table.find_all("tr")
@@ -48,7 +53,7 @@ class Command(BaseCommand):
                         # bye teams
                         continue
                     game_time = game_time_data.getText()
-                    if game_time == "TBD":
+                    if "TBD" in game_time:
                         # Just default to noon game for TBD games
                         game_time = "1:00 PM"
                     # "1:00 PM"
@@ -56,7 +61,11 @@ class Command(BaseCommand):
                         # Skip games that happen to be currently playing
                         continue
                     game_time_stamp = f"{game_time} {date_string}"
-                    game_datetime = datetime.datetime.strptime(game_time_stamp, "%I:%M %p %A, %B %d, %Y")
+                    try:
+                        game_datetime = datetime.datetime.strptime(game_time_stamp, "%I:%M %p %A, %B %d, %Y")
+                    except Exception:
+                        LOG.warn("Unable to add game with time stamp, skipping: " + game_time_stamp)
+                        continue
                     # Times are in Eastern, adjust to Central
                     game_datetime = game_datetime - datetime.timedelta(hours=1)
                     # Make gametime timezone aware, times are retrieved in EST
