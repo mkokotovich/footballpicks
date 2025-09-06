@@ -1,4 +1,5 @@
 # From: http://espn.go.com/nfl/schedule
+import gc
 import logging
 import sys
 import datetime
@@ -103,6 +104,11 @@ class Command(BaseCommand):
                         if not dry_run:
                             obj.save()
                         all_game_ids.append(obj.id)
+                    row.decompose()
+                table.decompose()
+            div.decompose()
+        del soup
+        gc.collect()
 
         if len(all_game_ids) < 10:
             # There either was a problem finding the games or this week already happened
