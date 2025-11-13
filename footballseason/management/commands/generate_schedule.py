@@ -64,11 +64,12 @@ class Command(BaseCommand):
                     game_time_stamp = f"{game_time} {date_string}"
                     try:
                         game_datetime = datetime.datetime.strptime(game_time_stamp, "%I:%M %p %A, %B %d, %Y")
+                        # Times are in Eastern, adjust to Central
+                        game_datetime = game_datetime - datetime.timedelta(hours=1)
                     except Exception:
-                        LOG.warn("Unable to add game with time stamp, skipping: " + game_time_stamp)
-                        continue
-                    # Times are in Eastern, adjust to Central
-                    game_datetime = game_datetime - datetime.timedelta(hours=1)
+                        game_datetime = fb_utils.get_gameday_for_season_and_week(season, week)
+                        LOG.warn(f"Unable to add game with time stamp ({game_time_stamp}), using generic gameday instead: {game_datetime}")
+
                     # Make gametime timezone aware, times are retrieved in EST
                     game_datetime = pytz.timezone("US/Central").localize(game_datetime)
 
@@ -89,12 +90,17 @@ class Command(BaseCommand):
                             f"Count not find either team {home_name} or {away_name}, unable to add game to schedule"
                         )
                         sys.exit(1)
+
                     try:
                         obj = Game.objects.get(season=season, week=week, home_team=home, away_team=away)
+                        LOG.info(f"Found existing game: {obj}")
                     except Game.DoesNotExist:
                         obj = Game(season=season, week=week, home_team=home, away_team=away, game_time=game_datetime)
-                        LOG.info("Adding: {0}".format(obj))
+                        LOG.info(f"Adding new game: {obj}")
                         updated_games += 1
+                    except Exception:
+                        LOG.exception("Unknown exception")
+                        raise
                     else:
                         if obj.game_time != game_datetime:
                             obj.game_time = game_datetime
