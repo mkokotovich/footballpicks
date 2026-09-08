@@ -40,7 +40,14 @@ python manage.py generate_schedule
 python manage.py reset_team_records
 ```
 
-Then run these in prod by first connecting to a prod instance:
+In 2026, fly.io wasn't able to connect to espn. To update the schedule from
+a laptop, run:
+
+```
+./generate_schedule_on_prod.sh
+```
+
+Alternatively, run the above commands in prod by first connecting to a prod instance:
 
 ```
 fly ssh console
