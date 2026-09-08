@@ -28,7 +28,7 @@ class Command(BaseCommand):
     def add_games_from_one_week(self, season, week, update_only, dry_run):
         updated_games = 0
 
-        url = "http://espn.go.com/nfl/schedule/_/year/{0}/week/{1}".format(season, week)
+        url = "https://espn.go.com/nfl/schedule/_/year/{0}/week/{1}".format(season, week)
         LOG.info("url: {0}".format(url))
         with urllib.request.urlopen(url) as response:
             html = response.read()
